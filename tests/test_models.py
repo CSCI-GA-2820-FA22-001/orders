@@ -5,23 +5,27 @@ Test cases for YourResourceModel Model
 import os
 import logging
 import unittest
-from service.models import YourResourceModel, DataValidationError, db
-
+from service import app
+from service.models import Order, DataValidationError, db
+from service.config import DATABASE_URI
 ######################################################################
 #  <your resource name>   M O D E L   T E S T   C A S E S
 ######################################################################
-class TestYourResourceModel(unittest.TestCase):
+class TestOrderModel(unittest.TestCase):
     """ Test Cases for YourResourceModel Model """
 
     @classmethod
     def setUpClass(cls):
         """ This runs once before the entire test suite """
-        pass
+        app.config["TESTING"] = True
+        app.config["DEBUG"] = False
+        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+        app.logger.setLevel(logging.CRITICAL)
 
     @classmethod
     def tearDownClass(cls):
         """ This runs once after the entire test suite """
-        pass
+        db.session.close()
 
     def setUp(self):
         """ This runs before each test """
@@ -29,12 +33,13 @@ class TestYourResourceModel(unittest.TestCase):
 
     def tearDown(self):
         """ This runs after each test """
-        pass
+        db.session.remove()
 
     ######################################################################
     #  T E S T   C A S E S
     ######################################################################
 
-    def test_XXXX(self):
+    def test_create_order(self):
         """ It should always be true """
-        self.assertTrue(True)
+        orders = Order.all()
+
