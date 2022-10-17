@@ -5,11 +5,16 @@ All of the models are stored in this module
 """
 import logging
 from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
+from flask_migrate import Migrate
+from sqlalchemy import ForeignKey
+from service import app
 import json
 logger = logging.getLogger("flask.app")
 
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
+migrate = Migrate(app, db)
 
 
 class DataValidationError(Exception):
@@ -23,7 +28,7 @@ class Order(db.Model):
     id: int
     items: list[int]
     """
-
+    __tablename__ = "order"
     app = None
 
     # Table Schema
@@ -31,16 +36,15 @@ class Order(db.Model):
     user_id = db.Column(db.Integer, nullable=False)
     create_time = db.Column(db.String(63), nullable=False)
     status = db.Column(db.Integer, nullable=False, default=0)
-    items = db.Column(db.Text)
 
     def __repr__(self):
-        return "<User {self.user_id} Order id=[{self.id}]>"
+        return f"<User {self.user_id} Create Time={self.create_time} Status={self.status}>"
 
     def create(self):
         """
         Creates a YourResourceModel to the database
         """
-        logger.info("Creating %s", self.id)
+        logger.info("Creating %s %s %s", self.id, self.create_time, self.status)
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
@@ -60,7 +64,7 @@ class Order(db.Model):
 
     def serialize(self):
         """ Serializes a YourResourceModel into a dictionary """
-        return {"id": self.id, "name": self.items}
+        return {"id": self.id, "user_id": self.user_id, "create_time": self.create_time, "status": self.status}
 
     def deserialize(self, data):
         """
@@ -70,7 +74,6 @@ class Order(db.Model):
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.items = data["items"]
             self.user_id = data["user_id"]
             self.create_time = data["create_time"]
             self.status = data["status"]
@@ -86,7 +89,7 @@ class Order(db.Model):
         return self
 
     @classmethod
-    def init_db(cls, app):
+    def init_db(cls, app: Flask):
         """ Initializes the database session """
         logger.info("Initializing database")
         cls.app = app
@@ -124,12 +127,12 @@ class Items(db.Model):
         oder_id:int
         item_id:int
         """
-
+        __tablename__ = "items"
         app = None
 
         # Table Schema
         id = db.Column(db.Integer, primary_key=True)
-        order_id = db.Column(db.Integer, nullable=False)
+        order_id = db.Column(db.Integer, ForeignKey("order.id"), nullable=False)
         item_id = db.Column(db.Integer, nullable=False)
 
         def __repr__(self):

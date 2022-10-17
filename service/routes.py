@@ -38,7 +38,6 @@ def create_order():
     check_content_type("application/json")
     order = Order()
     order.deserialize(request.get_json())
-    print(order.items)
     order.create()
     # return a message
     message = order.serialize()
