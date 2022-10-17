@@ -12,6 +12,7 @@ from service.models import Order
 
 # Import Flask application
 from . import app
+import json
 logger = logging.getLogger("flask.app")
 
 ######################################################################
@@ -54,9 +55,19 @@ def delete_order(order_id):
         order_id (int): the id of the order
     """
     order = Order.find(order_id)
-    print(order)
     if order:
         order.delete()
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
+@app.route("/orders/<int:order_id>/items/<int:item_id>")
+def delete_order_item(order_id, item_id):
+    order = Order.find(order_id)
+    if order:
+        items = json.loads(order.items)
+        if item_id in items:
+            items.remove(item_id)
+            order.items = json.dumps(items)
+            order.update()
     return make_response("", status.HTTP_204_NO_CONTENT)
 
 @app.route("/orders/test", methods=["GET"])

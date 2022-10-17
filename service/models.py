@@ -70,7 +70,7 @@ class Order(db.Model):
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.items = data["item"]
+            self.items = data["items"]
             self.user_id = data["user_id"]
             self.create_time = data["create_time"]
             self.status = data["status"]

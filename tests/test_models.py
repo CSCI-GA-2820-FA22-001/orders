@@ -21,6 +21,7 @@ class TestOrderModel(unittest.TestCase):
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
+        Order.init_db(app)
 
     @classmethod
     def tearDownClass(cls):
@@ -29,7 +30,8 @@ class TestOrderModel(unittest.TestCase):
 
     def setUp(self):
         """ This runs before each test """
-        pass
+        db.session.query(Order).delete()  # clean up the last tests
+        db.session.commit()
 
     def tearDown(self):
         """ This runs after each test """
@@ -41,4 +43,4 @@ class TestOrderModel(unittest.TestCase):
 
     def test_create_order(self):
         """ It should always be true """
-        orders = Order.all()
+        order = Order(user_id=123, create_time="2022-10-16", status=1, item="[1,2,3]")
