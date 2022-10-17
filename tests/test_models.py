@@ -47,6 +47,7 @@ class TestOrderModel(unittest.TestCase):
 
     def test_create_order(self):
         """ It should always be true """
+        # Test constructor
         order = Order(user_id=123, create_time="2022-10-16", status=1)
         order.create()
         self.assertEqual(str(order), "<User 123 Create Time=2022-10-16 Status=1>")
@@ -54,6 +55,18 @@ class TestOrderModel(unittest.TestCase):
         self.assertEqual(order.user_id, 123)
         self.assertEqual(order.create_time, "2022-10-16")
         self.assertEqual(order.status, 1)
+        # Test create
+        db_order = Order.find(order.id)
+        self.assertEqual(str(db_order), "<User 123 Create Time=2022-10-16 Status=1>")
+        self.assertTrue(db_order is not None)
+        self.assertEqual(db_order.user_id, 123)
+        self.assertEqual(db_order.id, order.id)
+        self.assertEqual(db_order.create_time, "2022-10-16")
+        self.assertEqual(db_order.status, 1)
+
+        bad_order = Order.find(order.id+1)
+        self.assertTrue(bad_order is None)
+
         
     def test_delete_order(self):
         order = Order(user_id=123, create_time="2022-10-16", status=1)
