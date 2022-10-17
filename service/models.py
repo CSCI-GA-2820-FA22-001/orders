@@ -28,10 +28,13 @@ class Order(db.Model):
 
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    create_time = db.Column(db.String(63), nullable=False)
+    status = db.Column(db.Integer, nullable=False, default=0)
     items = db.Column(db.Text)
 
     def __repr__(self):
-        return "<Order Model id=[%s]>" % self.id
+        return "<User {self.user_id} Order id=[{self.id}]>"
 
     def create(self):
         """
@@ -68,6 +71,9 @@ class Order(db.Model):
         """
         try:
             self.items = data["item"]
+            self.user_id = data["user_id"]
+            self.create_time = data["create_time"]
+            self.status = data["status"]
         except KeyError as error:
             raise DataValidationError(
                 "Invalid YourResourceModel: missing " + error.args[0]

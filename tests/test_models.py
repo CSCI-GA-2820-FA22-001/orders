@@ -42,4 +42,3 @@ class TestOrderModel(unittest.TestCase):
     def test_create_order(self):
         """ It should always be true """
         orders = Order.all()
-
