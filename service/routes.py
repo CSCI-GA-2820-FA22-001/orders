@@ -45,6 +45,23 @@ def create_order():
 		jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 	)
 
+
+@app.route("/orders/<int:order_id>", methods=["GET"])
+def get_order_by_id(order_id):
+	"""Delete order by order id
+
+	Args:
+		order_id (int): the id of the order
+	"""
+	app.logger.info("Request for pet with id: %s", order_id)
+	order = Order.find(order_id)
+	if not order:
+		abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{order_id}' was not found.")
+		
+	app.logger.info("Returning pet: %s", order.id)
+	return jsonify(order.serialize()), status.HTTP_200_OK
+
+
 @app.route("/orders/<int:order_id>", methods=["DELETE"])
 def delete_order(order_id):
 	"""Delete order by order id
