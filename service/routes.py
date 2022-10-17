@@ -18,25 +18,20 @@ logger = logging.getLogger("flask.app")
 ######################################################################
 # GET INDEX
 ######################################################################
-@app.route("/")
+@app.route("/", methods=["GET"])
 def index():
 	""" Root URL response """
 	return (
-		jsonify(
-			name="Order REST API Service",
-			version="1.0",
-			paths=url_for("/", _external=True),
-		),
+		"Home Page",
 		status.HTTP_200_OK,
 	)
+
 @app.route("/orders", methods=["POST"])
 def create_order():
 	"""Create an order
 	request body: {
 		"item": [id1, id2, ...]
 	}
-
-	
 	"""
 	app.logger.info("Request create an order")
 	check_content_type("application/json")
@@ -62,7 +57,7 @@ def delete_order(order_id):
 		order.delete()
 	return make_response("", status.HTTP_204_NO_CONTENT)
 
-@app.route("/orders/<int:order_id>/items/<int:item_id>")
+@app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["DELETE"])
 def delete_order_item(order_id, item_id):
 	order = Order.find(order_id)
 	if order:
