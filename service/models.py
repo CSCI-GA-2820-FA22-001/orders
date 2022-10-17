@@ -118,8 +118,8 @@ class Order(db.Model):
 
 	@classmethod
 	def all(cls):
-		""" Returns all of the YourResourceModels in the database """
-		logger.info("Processing all YourResourceModels")
+		""" Returns all of the orders in the database """
+		logger.info("Processing all orders")
 		return cls.query.all()
 
 	@classmethod
@@ -130,12 +130,12 @@ class Order(db.Model):
 
 	@classmethod
 	def find_by_user_id(cls, user_id):
-		"""Returns all YourResourceModels with the given name
+		"""Returns all orders with the given user_id
 
 		Args:
-			name (string): the name of the YourResourceModels you want to match
+			user_id (string): the user id of the order you want to match
 		"""
-		logger.info("Processing name query for %s ...", user_id)
+		logger.info("Processing user_id query for %d ...", user_id)
 		return cls.query.filter(cls.user_id == user_id)
 
 class Items(db.Model):
@@ -217,8 +217,8 @@ class Items(db.Model):
 
 		@classmethod
 		def all(cls):
-			""" Returns all of the YourResourceModels in the database """
-			logger.info("Processing all YourResourceModels")
+			""" Returns all of the order items in the database """
+			logger.info("Processing all items in order")
 			return cls.query.all()
 
 		@classmethod
@@ -228,11 +228,11 @@ class Items(db.Model):
 			return cls.query.get(by_id)
 
 		@classmethod
-		def find_by_name(cls, name):
-			"""Returns all YourResourceModels with the given name
+		def find_by_order_id(cls, by_order_id):
+			"""Returns all order items with the given order id
 
 			Args:
-				name (string): the name of the YourResourceModels you want to match
+				by_order_id (int): the order id of the order items you want to match
 			"""
-			logger.info("Processing name query for %s ...", name)
-			return cls.query.filter(cls.name == name)
+			logger.info("Processing order_id query for %d ...", by_order_id)
+			return cls.query.filter(cls.order_id == by_order_id)

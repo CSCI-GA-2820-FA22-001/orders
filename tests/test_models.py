@@ -13,7 +13,7 @@ from service.config import DATABASE_URI
 
 
 ######################################################################
-#  <your resource name>   M O D E L   T E S T   C A S E S
+#  <orders>   M O D E L   T E S T   C A S E S
 ######################################################################
 class TestOrderModel(unittest.TestCase):
 	""" Test Cases for YourResourceModel Model """
