@@ -67,12 +67,82 @@ class TestOrderModel(unittest.TestCase):
         bad_order = Order.find(order.id+1)
         self.assertTrue(bad_order is None)
 
-        
     def test_delete_order(self):
+        """test delete function in Order"""
         order = Order(user_id=123, create_time="2022-10-16", status=1)
         order.create()
         order_id = order.id
         order.delete()
-        o = Order.find(order_id)
-        self.assertEqual(o, None)
+        db_order = Order.find(order_id)
+        self.assertEqual(db_order, None)
 
+    def test_update_order(self):
+        """test update function in Order"""
+        order = Order(user_id=123, create_time="2022-10-16", status=1)
+        order.create()
+        order.user_id = 234
+        order.create_time = "2021-1-2"
+        order.status = 0
+        order.update()
+        db_order = Order.find(order.id)
+        self.assertTrue(db_order is not None)
+        self.assertEqual(db_order.user_id, 234)
+        self.assertEqual(db_order.create_time, "2021-1-2")
+        self.assertEqual(db_order.status, 0)
+
+    def test_serialize_order(self):
+        """test serialize"""
+        order = Order(user_id=123, create_time="2022-10-16", status=1)
+        test_dict = {"id": None, "user_id": 123, "create_time": "2022-10-16", "status": 1}
+        self.assertEqual(order.serialize(), test_dict)
+
+    def test_deserialize_order(self):
+        """test deserialize order"""
+        order = Order()
+        init_dict = {"user_id": 123, "create_time": "2021-10-16", "status": 0}
+        bad_dic_1 = {"user_id": 123, "create_time": "2021-10-16"}
+        bad_dic_2 = {"create_time": "2021-10-16", "status": 0}
+        bad_dic_3 = {"user_id": 123, "status": 0}
+        bad_dic_4 = {"user_id": "bad userid", "create_time": 20140103, "status": "bad status"}
+        bad_dic_5 = {"user_id": 123, "create_time": 20140103, "status": 0}
+        bad_dic_6 = {"user_id": 123, "create_time": "2021-10-16", "status": "bad status"}
+        with self.assertRaises(DataValidationError):
+            order.deserialize(bad_dic_1)
+        with self.assertRaises(DataValidationError):
+            order.deserialize(bad_dic_2)
+        with self.assertRaises(DataValidationError):
+            order.deserialize(bad_dic_3)
+        with self.assertRaises(DataValidationError):
+            order.deserialize(bad_dic_4)
+        with self.assertRaises(DataValidationError):
+            order.deserialize(bad_dic_5)
+        with self.assertRaises(DataValidationError):
+            order.deserialize(bad_dic_6)
+        updated_order = order.deserialize(init_dict)
+        self.assertEqual(updated_order.user_id, 123)
+        self.assertEqual(updated_order.create_time, "2021-10-16")
+        self.assertEqual(updated_order.status, 0)
+    
+    def test_list_all_order(self):
+        """test serialize"""
+        self.assertEqual(Order.all(), [])
+        order1 = Order(user_id=123, create_time="2022-10-16", status=1)
+        order2 = Order(user_id=124, create_time="2022-10-6", status=1)
+        order3 = Order(user_id=125, create_time="2022-10-5", status=1)
+        order1.create()
+        order2.create()
+        order3.create()
+        self.assertEqual(len(Order.all()), 3)
+
+    def test_find_by_user_id(self):
+        """test find by user id"""
+        order1 = Order(user_id=123, create_time="2022-10-16", status=1)
+        order2 = Order(user_id=123, create_time="2022-10-6", status=1)
+        order3 = Order(user_id=123, create_time="2022-10-5", status=1)
+        order1.create()
+        order2.create()
+        order3.create()
+        found = Order.find_by_user_id(123)
+        self.assertEqual(found.count(), 3)
+        for order in found:
+            self.assertEqual(order.user_id, 123)

@@ -4,6 +4,7 @@ Models for YourResourceModel
 All of the models are stored in this module
 """
 import logging
+from typing_extensions import assert_type
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from flask_migrate import Migrate
@@ -53,7 +54,7 @@ class Order(db.Model):
         """
         Updates a YourResourceModel to the database
         """
-        logger.info("Saving %s", self.name)
+        logger.info("Saving %s", self.id)
         db.session.commit()
 
     def delete(self):
@@ -73,18 +74,35 @@ class Order(db.Model):
         Args:
             data (dict): A dictionary containing the resource data
         """
-        try:
-            self.user_id = data["user_id"]
-            self.create_time = data["create_time"]
-            self.status = data["status"]
+        try: 
+            # assert_type(data["user_id"], int)
+            # assert_type(data["create_time"], str)
+            # assert_type(data["status"], int)
+            if isinstance(data["user_id"], int):
+                    self.user_id = data["user_id"]
+            else:
+                raise DataValidationError(
+                    "Invalid type for int [user_id]: "
+                    + str(type(data["user_id"]))
+                )
+
+            if isinstance(data["create_time"], str):
+                self.create_time = data["create_time"]
+            else:
+                raise DataValidationError(
+                    "Invalid type for str [create_time]: "
+                    + str(type(data["create_time"]))
+                )
+            if isinstance(data["status"], int):
+                self.status = data["status"]
+            else:
+                raise DataValidationError(
+                    "Invalid type for int [status]: "
+                    + str(type(data["status"]))
+                )
         except KeyError as error:
             raise DataValidationError(
                 "Invalid YourResourceModel: missing " + error.args[0]
-            ) from error
-        except TypeError as error:
-            raise DataValidationError(
-                "Invalid YourResourceModel: body of request contained bad or no data - "
-                "Error message: " + error
             ) from error
         return self
 
@@ -111,14 +129,14 @@ class Order(db.Model):
         return cls.query.get(by_id)
 
     @classmethod
-    def find_by_name(cls, name):
+    def find_by_user_id(cls, user_id):
         """Returns all YourResourceModels with the given name
 
         Args:
             name (string): the name of the YourResourceModels you want to match
         """
-        logger.info("Processing name query for %s ...", name)
-        return cls.query.filter(cls.name == name)
+        logger.info("Processing name query for %s ...", user_id)
+        return cls.query.filter(cls.user_id == user_id)
 
 class Items(db.Model):
         """
