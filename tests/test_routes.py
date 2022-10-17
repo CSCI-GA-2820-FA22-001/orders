@@ -12,6 +12,7 @@ from unittest.mock import MagicMock, patch
 from service import app
 from service.models import db, Order, Items
 from service.common import status  # HTTP Status Codes
+from .factories import create_random_time_str
 
 DATABASE_URI = os.getenv(
 	"DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
@@ -48,13 +49,23 @@ class TestYourResourceServer(TestCase):
 		""" This runs after each test """
 		db.session.remove()
 
+
+	def _create_order(self, count):
+		"""Factory method to create pets in bulk"""
+		order = []
+		for _ in range(count):
+			print(create_random_time_str())
+		return order
+
 	######################################################################
 	#  P L A C E   T E S T   C A S E S   H E R E
 	######################################################################
 
 	def test_index(self):
 		""" It should call the home page """
-		resp = app.get("/")
-		# print(resp.)
-		self.assertEqual(resp.status_code, status.HTTP_200_OK)
+		resp = self.client.get("/")
+		self.assertEqual(resp.status_code, status.HTTP_200_OK) 
 	
+	def test_delete_order(self):
+		""" test Delete /orders/<int:order_id>"""
+		self._create_order(1)
