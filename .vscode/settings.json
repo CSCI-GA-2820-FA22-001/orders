@@ -28,6 +28,8 @@
         "**/*.pyc": true,
         "**/__pycache__": true
     },
-    "editor.renderWhitespace": "all", 
+    "editor.renderWhitespace": "all",
+    "python.analysis.typeCheckingMode": "basic",
+    
 }
 
