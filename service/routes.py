@@ -9,8 +9,7 @@ import logging
 from typing import List
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from .common import status  # HTTP Status Codes
-from service.models import Order
-from service.models import Items
+from service.models import Order, Items
 
 # Import Flask application
 from . import app
@@ -90,11 +89,10 @@ def delete_order(order_id):
 def delete_order_item(order_id, item_id):
 	order = Order.find(order_id)
 	if order:
-		items = json.loads(order.items)
-		if item_id in items:
-			items.remove(item_id)
-			order.items = json.dumps(items)
-			order.update()
+		found = Items.find_by_order_id(order_id)
+		for item in found:
+			if item.id == item_id:
+				item.delete()
 	return make_response("", status.HTTP_204_NO_CONTENT)
 
 ######################################################################
