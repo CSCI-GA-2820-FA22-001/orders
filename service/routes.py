@@ -47,8 +47,7 @@ def create_order():
 		items.order_id = order.id
 		items.item_id = item_id
 		items.create()
-		# return a message
-		message_item = items.serialize()
+
 
 
 	location_url = url_for("create_order", order_id=order.id, _external=True)
@@ -92,14 +91,17 @@ def add_order_item(order_id):
         order_id -- the id of the order
 	"""
 	app.logger.info("Request add an item to order: %s", order_id)
+	check_content_type("application/json")
 	order = Order.find(order_id)
 	if order:
 		item = Items()
 		item.deserialize(request.get_json())
 		item.create()
 		# return a message
-		message = order.serialize()
-	return make_response("",status.HTTP_201_CREATED)
+		message = item.serialize()
+	else:
+		message = ""
+	return make_response(jsonify(message),status.HTTP_201_CREATED)
 
 
 	

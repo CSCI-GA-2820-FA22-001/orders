@@ -121,5 +121,25 @@ class TestYourResourceServer(TestCase):
 		self.assertEqual(new_order["user_id"], test_order.user_id)
 		self.assertEqual(new_order["create_time"], test_order.create_time)
 		self.assertEqual(new_order["status"], test_order.status)
+	
+	def test_add_order_item(self):
+		""" It should add an item to the order"""
+		order1 = Order(user_id=123, create_time="2021-10-10", status=1)
+		order1.create()
+		item1 = Items(order_id=order1.id, item_id= 1)
+		item1.create()
+
+		response = self.client.post(f"{BASE_URL}/{order1.id}/items", json=item1.serialize())
+		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+		# Check the data
+		new_item = response.get_json()
+		self.assertIsNotNone(new_item)
+		self.assertEqual(new_item["order_id"], item1.order_id)
+		self.assertEqual(new_item["item_id"], item1.item_id)
+
+		response = self.client.post(f"{BASE_URL}/{404}/items", json=item1.serialize())
+		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+		self.assertTrue(""==response.get_json())
 
 	
