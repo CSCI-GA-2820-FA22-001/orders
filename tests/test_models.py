@@ -63,6 +63,12 @@ class TestOrderModel(unittest.TestCase):
 		self.assertEqual(db_order.id, order.id)
 		self.assertEqual(db_order.create_time, "2022-10-16")
 		self.assertEqual(db_order.status, 1)
+		# Test Items create
+		items = Items(order_id=123, item_id=321)
+		items.create()
+		self.assertTrue(items is not None)
+		self.assertEqual(items.order_id, 123)
+		self.assertEqual(items.item_id, 321)
 
 		bad_order = Order.find(order.id+1)
 		self.assertTrue(bad_order is None)

@@ -84,6 +84,25 @@ def delete_order(order_id):
 	if order:
 		order.delete()
 	return make_response("", status.HTTP_204_NO_CONTENT)
+@app.route("/orders/<int:order_id>/items", methods=["POST"])
+def add_order_item(order_id):
+	"""Add item to order by id
+
+	Keyword arguments:
+        order_id -- the id of the order
+	"""
+	app.logger.info("Request add an item to order: %s", order_id)
+	order = Order.find(order_id)
+	if order:
+		item = Items()
+		item.deserialize(request.get_json())
+		item.create()
+		# return a message
+		message = order.serialize()
+	return make_response("",status.HTTP_201_CREATED)
+
+
+	
 
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["DELETE"])
 def delete_order_item(order_id, item_id):
