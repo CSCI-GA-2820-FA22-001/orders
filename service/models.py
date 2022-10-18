@@ -75,9 +75,6 @@ class Order(db.Model):
 			data (dict): A dictionary containing the resource data
 		"""
 		try: 
-			# assert_type(data["user_id"], int)
-			# assert_type(data["create_time"], str)
-			# assert_type(data["status"], int)
 			if isinstance(data["user_id"], int):
 					self.user_id = data["user_id"]
 			else:
@@ -154,7 +151,7 @@ class Items(db.Model):
 		item_id = db.Column(db.Integer, nullable=False)
 
 		def __repr__(self):
-			return "<Order id=[{self.order_id}] Item id=[{self.item_id}]>"
+			return f"<Order id=[{self.order_id}] Item id=[{self.item_id}]>"
 
 		def create(self):
 			"""
@@ -169,7 +166,7 @@ class Items(db.Model):
 			"""
 			Updates a YourResourceModel to the database
 			"""
-			logger.info("Saving %s", self.name)
+			logger.info("Saving %s %s %s", self.id, self.order_id, self.item_id)
 			db.session.commit()
 
 		def delete(self):
@@ -190,18 +187,23 @@ class Items(db.Model):
 				data (dict): A dictionary containing the resource data
 			"""
 			try:
-				self.items = data["item"]
-				self.order_id = data["order_id"]
-				self.create_time = data["create_time"]
-				self.status = data["status"]
+				if isinstance(data["order_id"], int):
+					self.order_id = data["order_id"]
+				else:
+					raise DataValidationError(
+						"Invalid type for int [order_id]: "
+						+ str(type(data["order_id"]))
+					)
+				if isinstance(data["item_id"], int):
+					self.item_id = data["item_id"]
+				else:
+					raise DataValidationError(
+						"Invalid type for int [item_id]: "
+						+ str(type(data["item_id"]))
+					)
 			except KeyError as error:
 				raise DataValidationError(
 					"Invalid YourResourceModel: missing " + error.args[0]
-				) from error
-			except TypeError as error:
-				raise DataValidationError(
-					"Invalid YourResourceModel: body of request contained bad or no data - "
-					"Error message: " + error
 				) from error
 			return self
 
