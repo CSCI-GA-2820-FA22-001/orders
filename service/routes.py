@@ -6,9 +6,11 @@ Describe what your service does here
 from crypt import methods
 from email.policy import HTTP
 import logging
+from typing import List
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from .common import status  # HTTP Status Codes
 from service.models import Order
+from service.models import Items
 
 # Import Flask application
 from . import app
@@ -45,10 +47,26 @@ def create_order():
 	order.create()
 	# return a message
 	message = order.serialize()
+	
+	for item_id in request.get_json().get("items",[]):
+		items = Items()
+		items.order_id = order.id
+		items.item_id = item_id
+		items.create()
+		# return a message
+		message_item = items.serialize()
+
+
 	location_url = url_for("create_order", order_id=order.id, _external=True)
 	return make_response(
 		jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 	)
+
+"""
+@app.route("/orders/<int:order_id>/items", methods="POST")
+def add_order_item(order_id):
+	return
+"""
 
 @app.route("/orders/<int:order_id>", methods=["DELETE"])
 def delete_order(order_id):

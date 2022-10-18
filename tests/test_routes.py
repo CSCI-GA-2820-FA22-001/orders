@@ -58,3 +58,34 @@ class TestYourResourceServer(TestCase):
 		# print(resp.)
 		self.assertEqual(resp.status_code, status.HTTP_200_OK)
 	
+	def test_create_order(self):
+		""" It should Create a new Order"""
+		test_order = Order()
+		test_order.user_id = 0
+		test_order.create_time = "2021/03/16 16:30:00"
+		test_order.status = 0
+		test_order.create()
+
+		logging.debug("Test Order: %s", test_order.serialize())
+		response = self.client.post(BASE_URL, json=test_order.serialize())
+		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+		# Make sure location header is set
+		location = response.headers.get("Location", None)
+		self.assertIsNotNone(location)
+
+		# Check the data is correct
+		new_order = response.get_json()
+		self.assertEqual(new_order["user_id"], test_order.user_id)
+		self.assertEqual(new_order["create_time"], test_order.create_time)
+		self.assertEqual(new_order["status"], test_order.status)
+
+		# Check that the location header was correct
+		response = self.client.get(location)
+		self.assertEqual(response.status_code, status.HTTP_200_OK)
+		new_order = response.get_json()
+		self.assertEqual(new_order["user_id"], test_order.user_id)
+		self.assertEqual(new_order["create_time"], test_order.create_time)
+		self.assertEqual(new_order["status"], test_order.status)
+
+	
