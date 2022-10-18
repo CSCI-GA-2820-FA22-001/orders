@@ -184,6 +184,14 @@ class TestItemsModel(unittest.TestCase):
 	#  T E S T   C A S E S
 	######################################################################
 	
+	def test_item_repr(self):
+		"""test item __repr__"""
+		order = Order(user_id=123, create_time="2021-10-10", status=1)
+		order.create()
+		item = Items(order_id=order.id, item_id= 1)
+		item.create()
+		self.assertEqual(str(item), f"<Order id=[{item.order_id}] Item id=[{item.item_id}]>")
+
 	def test_item_find(self):
 		"""test item find"""
 		order1 = Order(user_id=123, create_time="2021-10-10", status=1)
@@ -202,3 +210,13 @@ class TestItemsModel(unittest.TestCase):
 		found = Items.find_by_order_id(order2.id)
 		for item in found:
 			self.assertEqual(item.order_id, order2.id)
+	
+	def test_item_update(self):
+		"""test item update"""
+		order = Order(user_id=123, create_time="2021-10-10", status=1)
+		order.create()
+		item = Items(order_id=order.id, item_id= 1)
+		item.create()
+		item.item_id = 10
+		item.update()
+		self.assertEqual(Items.find(item.id).item_id, 10)
