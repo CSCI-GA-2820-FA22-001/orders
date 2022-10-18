@@ -19,15 +19,11 @@ logger = logging.getLogger("flask.app")
 ######################################################################
 # GET INDEX
 ######################################################################
-@app.route("/")
+@app.route("/", methods=["GET"])
 def index():
     """ Root URL response """
-    return (
-        jsonify(
-            name="Order REST API Service",
-            version="1.0",
-            paths=url_for("/", _external=True),
-        ),
+    return make_response(
+        "Home Page",
         status.HTTP_200_OK,
     )
 
@@ -69,14 +65,31 @@ def list_orders():
     if user_id is None:
         abort(
             status.HTTP_401_UNAUTHORIZED,
-            "unauthorized user",
+            "Unauthorized user. Needs user_id.",
         )
     
     orders = Order.find_by_user_id(user_id)
     return make_response(
-        jsonify(order.serialize() for order in orders), 
+        jsonify([order.serialize() for order in orders]), 
         status.HTTP_200_OK,
     )
+
+
+
+@app.route("/orders/<int:order_id>", methods=["GET"])
+def get_order_by_id(order_id):
+    """Delete order by order id
+
+    Args:
+        order_id (int): the id of the order
+    """
+    app.logger.info("Request for pet with id: %s", order_id)
+    order = Order.find(order_id)
+    if not order:
+        abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{order_id}' was not found.")
+        
+    app.logger.info("Returning pet: %s", order.id)
+    return jsonify(order.serialize()), status.HTTP_200_OK
 
 
 @app.route("/orders/<int:order_id>", methods=["DELETE"])
@@ -109,11 +122,11 @@ def list_order_items(order_id):
         )
 
     items = Items.find_by_order_id(order_id)
-    return make_response(jsonify(item.serialize() for item in items), status.HTTP_200_OK)
+    return make_response(jsonify([item.serialize() for item in items]), status.HTTP_200_OK)
 
 
 
-@app.route("/orders/<int:order_id>/items/<int:item_id>")
+@app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["DELETE"])
 def delete_order_item(order_id, item_id):
     order = Order.find(order_id)
     if order:
