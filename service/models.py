@@ -150,7 +150,7 @@ class Items(db.Model):
 
 		# Table Schema
 		id = db.Column(db.Integer, primary_key=True)
-		order_id = db.Column(db.Integer, ForeignKey("order.id"), nullable=False)
+		order_id = db.Column(db.Integer, ForeignKey("order.id", ondelete="CASCADE"), nullable=False)
 		item_id = db.Column(db.Integer, nullable=False)
 
 		def __repr__(self):
@@ -236,3 +236,11 @@ class Items(db.Model):
 			"""
 			logger.info("Processing name query for %s ...", name)
 			return cls.query.filter(cls.name == name)
+		
+		@classmethod
+		def find_by_order_id(cls, order_id):
+			"""
+			Find all items with order_id
+			"""
+			logger.info("Processing order_id of item query for %s ...", order_id)
+			return cls.query.filter(Items.order_id == order_id)

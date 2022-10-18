@@ -8,7 +8,7 @@ import unittest
 
 from importlib_metadata import metadata
 from service import app
-from service.models import Order, DataValidationError, db
+from service.models import Order, DataValidationError, db, Items
 from service.config import DATABASE_URI
 
 
@@ -16,7 +16,7 @@ from service.config import DATABASE_URI
 #  <your resource name>   M O D E L   T E S T   C A S E S
 ######################################################################
 class TestOrderModel(unittest.TestCase):
-	""" Test Cases for YourResourceModel Model """
+	""" Test Cases for Order Model """
 
 	@classmethod
 	def setUpClass(cls):
@@ -146,3 +146,53 @@ class TestOrderModel(unittest.TestCase):
 		self.assertEqual(found.count(), 3)
 		for order in found:
 			self.assertEqual(order.user_id, 123)
+
+class TestItemsModel(unittest.TestCase):
+	""" Test Cases for Items Model """
+
+	@classmethod
+	def setUpClass(cls):
+		""" This runs once before the entire test suite """
+		app.config["TESTING"] = True
+		app.config["DEBUG"] = False
+		app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+		app.logger.setLevel(logging.CRITICAL)
+		Order.init_db(app)
+
+	@classmethod
+	def tearDownClass(cls):
+		""" This runs once after the entire test suite """
+		db.session.close()
+
+	def setUp(self):
+		""" This runs before each test """
+		db.session.query(Items).delete()  # clean up the last tests
+		db.session.query(Order).delete()
+		db.session.commit()
+
+	def tearDown(self):
+		""" This runs after each test """
+		db.session.remove()
+
+	######################################################################
+	#  T E S T   C A S E S
+	######################################################################
+	
+	def test_item_find(self):
+		"""test item find"""
+		order1 = Order(user_id=123, create_time="2021-10-10", status=1)
+		order2 = Order(user_id=124, create_time="2021-10-11", status=1)
+		order1.create()
+		order2.create()
+		item1 = Items(order_id=order1.id, item_id= 1)
+		item2 = Items(order_id=order1.id, item_id =2)
+		item3 = Items(order_id=order2.id, item_id =2)
+		item1.create()
+		item2.create()
+		item3.create()
+		found = Items.find_by_order_id(order1.id)
+		for item in found:
+			self.assertEqual(item.order_id, order1.id)
+		found = Items.find_by_order_id(order2.id)
+		for item in found:
+			self.assertEqual(item.order_id, order2.id)

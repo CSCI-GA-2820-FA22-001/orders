@@ -50,12 +50,19 @@ class TestYourResourceServer(TestCase):
 		db.session.remove()
 
 
-	def _create_order(self, count):
-		"""Factory method to create pets in bulk"""
-		order = []
+	def _create_order(self, count, user_id_incr = 0):
+		"""Factory method to create orders in bulk
+		param:
+			count -> int: represent how many orders you want to generate
+			user_id_incr -> int: what is the difference between previous user id and next user id
+		"""
+		orders = []
+		user_id = 0
 		for _ in range(count):
-			print(create_random_time_str())
-		return order
+			order = Order(user_id=user_id, create_time=create_random_time_str(), status=0)
+			orders.append(order)
+			user_id += user_id_incr
+		return orders
 
 	######################################################################
 	#  P L A C E   T E S T   C A S E S   H E R E
@@ -64,9 +71,36 @@ class TestYourResourceServer(TestCase):
 	def test_index(self):
 		""" It should call the home page """
 		resp = self.client.get("/")
-		# print(resp.)
 		self.assertEqual(resp.status_code, status.HTTP_200_OK)
 	
 	def test_delete_order(self):
 		""" test Delete /orders/<int:order_id>"""
-		self._create_order(1)
+		order = self._create_order(1, 1)[0]
+		order.create()
+		response = self.client.delete(f"{BASE_URL}/{order.id}")
+		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+		db_order = Order.find(order.id)
+		self.assertEqual(db_order, None)
+		# Todo: get this item and check if it's none
+	
+	def test_delete_item(self):
+		""" test delete item by order id and item id"""
+		order1 = Order(user_id=123, create_time="2021-10-10", status=1)
+		order1.create()
+		item1 = Items(order_id=order1.id, item_id= 1)
+		item2 = Items(order_id=order1.id, item_id =2)
+		item1.create()
+		item2.create()
+		response = self.client.delete(f"{BASE_URL}/{order1.id}/items/{item1.id}")
+		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+		
+		found = Items.find_by_order_id(order_id=order1.id)
+		count = len([item for item in found])
+		self.assertEqual(count, 1)
+		self.assertEqual(found[0].id, item2.id)
+
+		response = self.client.delete(f"{BASE_URL}/{order1.id}/items/{item2.id+1}")
+		found = Items.find_by_order_id(order_id=order1.id)
+		count = len([item for item in found])
+		self.assertEqual(count, 1)
+
