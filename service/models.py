@@ -191,7 +191,7 @@ class Items(db.Model):
 			"""
 			try:
 				self.items = data["item"]
-				self.user_id = data["user_id"]
+				self.order_id = data["order_id"]
 				self.create_time = data["create_time"]
 				self.status = data["status"]
 			except KeyError as error:
