@@ -31,58 +31,31 @@ def index():
 
 @app.route("/orders", methods=["POST"])
 def create_order():
-    """Create an order
-    request body: {
-        "item": [id1, id2, ...]
-    }
-    """
-    app.logger.info("Request create an order")
-    check_content_type("application/json")
-    order = Order()
-    order.deserialize(request.get_json())
-    order.create()
-    # return a message
-    message = order.serialize()
-    
-    for item_id in request.get_json().get("items",[]):
-        items = Items()
-        items.order_id = order.id
-        items.item_id = item_id
-        items.create()
-        # return a message
-        message_item = items.serialize()
+	"""Create an order
+	request body: {
+		"item": [id1, id2, ...]
+	}
+	"""
+	app.logger.info("Request create an order")
+	check_content_type("application/json")
+	order = Order()
+	order.deserialize(request.get_json())
+	order.create()
+	# return a message
+	message = order.serialize()
+	
+	for item_id in request.get_json().get("items",[]):
+		items = Items()
+		items.order_id = order.id
+		items.item_id = item_id
+		items.create()
 
 
-    location_url = url_for("create_order", order_id=order.id, _external=True)
-    return make_response(
-        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
-    )
 
-
-@app.route("/orders", methods=["GET"])
-def list_orders():
-    """List all orders
-    
-    Keyword arguments:
-    user_id -- the unique id representing a user
-    Return: all orders owned by user with user_id
-    """
-
-    app.logger.info("Request listing orders")
-    # TODO: how is parameter user_id passed?
-    args = request.args
-    user_id = args.get("user_id", type=int)
-    if user_id is None:
-        abort(
-            status.HTTP_401_UNAUTHORIZED,
-            "Unauthorized user. Needs user_id.",
-        )
-    
-    orders = Order.find_by_user_id(user_id)
-    return make_response(
-        jsonify([order.serialize() for order in orders]), 
-        status.HTTP_200_OK,
-    )
+	location_url = url_for("create_order", order_id=order.id, _external=True)
+	return make_response(
+		jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+	)
 
 
 @app.route("/orders/<int:order_id>", methods=["GET"])
@@ -140,17 +113,22 @@ def add_order_item(order_id):
 
     Keyword arguments:
         order_id -- the id of the order
-    """
-    app.logger.info("Request add an item to order: %s", order_id)
-    order = Order.find(order_id)
-    if order:
-        item = Items()
-        item.deserialize(request.get_json())
-        item.create()
-        # return a message
-        message = order.serialize()
-    return make_response("",status.HTTP_201_CREATED)
-    
+	"""
+	app.logger.info("Request add an item to order: %s", order_id)
+	check_content_type("application/json")
+	order = Order.find(order_id)
+	if order:
+		item = Items()
+		item.deserialize(request.get_json())
+		item.create()
+		# return a message
+		message = item.serialize()
+	else:
+		message = ""
+	return make_response(jsonify(message),status.HTTP_201_CREATED)
+
+
+	
 
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["DELETE"])
 def delete_order_item(order_id, item_id):
