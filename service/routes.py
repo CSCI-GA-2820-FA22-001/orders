@@ -31,31 +31,31 @@ def index():
 
 @app.route("/orders", methods=["POST"])
 def create_order():
-	"""Create an order
-	request body: {
-		"item": [id1, id2, ...]
-	}
-	"""
-	app.logger.info("Request create an order")
-	check_content_type("application/json")
-	order = Order()
-	order.deserialize(request.get_json())
-	order.create()
-	# return a message
-	message = order.serialize()
-	
-	for item_id in request.get_json().get("items",[]):
-		items = Items()
-		items.order_id = order.id
-		items.item_id = item_id
-		items.create()
+    """Create an order
+    request body: {
+        "item": [id1, id2, ...]
+    }
+    """
+    app.logger.info("Request create an order")
+    check_content_type("application/json")
+    order = Order()
+    order.deserialize(request.get_json())
+    order.create()
+    # return a message
+    message = order.serialize()
+    
+    for item_id in request.get_json().get("items",[]):
+        items = Items()
+        items.order_id = order.id
+        items.item_id = item_id
+        items.create()
 
 
 
-	location_url = url_for("create_order", order_id=order.id, _external=True)
-	return make_response(
-		jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
-	)
+    location_url = url_for("create_order", order_id=order.id, _external=True)
+    return make_response(
+        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    )
 
 
 @app.route("/orders/<int:order_id>", methods=["GET"])
@@ -113,22 +113,22 @@ def add_order_item(order_id):
 
     Keyword arguments:
         order_id -- the id of the order
-	"""
-	app.logger.info("Request add an item to order: %s", order_id)
-	check_content_type("application/json")
-	order = Order.find(order_id)
-	if order:
-		item = Items()
-		item.deserialize(request.get_json())
-		item.create()
-		# return a message
-		message = item.serialize()
-	else:
-		message = ""
-	return make_response(jsonify(message),status.HTTP_201_CREATED)
+    """
+    app.logger.info("Request add an item to order: %s", order_id)
+    check_content_type("application/json")
+    order = Order.find(order_id)
+    if order:
+        item = Items()
+        item.deserialize(request.get_json())
+        item.create()
+        # return a message
+        message = item.serialize()
+    else:
+        message = ""
+    return make_response(jsonify(message),status.HTTP_201_CREATED)
 
 
-	
+    
 
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["DELETE"])
 def delete_order_item(order_id, item_id):
