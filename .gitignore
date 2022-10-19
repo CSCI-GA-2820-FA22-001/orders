@@ -104,4 +104,4 @@ ENV/
 .ropeproject
 
 # ignore migrate
-migrations/
+# migrations/
