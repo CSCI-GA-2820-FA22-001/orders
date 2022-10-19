@@ -5,6 +5,7 @@ Test cases for YourResourceModel Model
 import os
 import logging
 import unittest
+from flask import jsonify
 
 from importlib_metadata import metadata
 from service import app
@@ -64,11 +65,27 @@ class TestOrderModel(unittest.TestCase):
 		self.assertEqual(db_order.create_time, "2022-10-16")
 		self.assertEqual(db_order.status, 1)
 		# Test Items create
-		items = Items(order_id=123, item_id=321)
+		items = Items(order_id=order.id, item_id=321)
 		items.create()
 		self.assertTrue(items is not None)
-		self.assertEqual(items.order_id, 123)
+		self.assertEqual(items.order_id, order.id)
 		self.assertEqual(items.item_id, 321)
+		# Test for loop Items create
+		info = {
+			"order_id": order.id,
+			"items": [1,2,3]
+		}
+		for item_id in jsonify(info).get_json().get("items"):
+			items = Items()
+			items.order_id = order.id
+			items.item_id = item_id
+			items.create()
+		found = Items.find_by_order_id(order.id)
+		item_list = [item for item in found]
+		count = len(item_list)
+		self.assertEqual(count, 3)
+		self.assertEqual(found[2].order_id, order.id)
+		self.assertEqual(found[2].item_id, 3)
 
 		bad_order = Order.find(order.id+1)
 		self.assertTrue(bad_order is None)
