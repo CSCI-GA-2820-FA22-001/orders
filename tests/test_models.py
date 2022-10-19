@@ -64,12 +64,7 @@ class TestOrderModel(unittest.TestCase):
 		self.assertEqual(db_order.id, order.id)
 		self.assertEqual(db_order.create_time, "2022-10-16")
 		self.assertEqual(db_order.status, 1)
-		# Test Items create
-		items = Items(order_id=order.id, item_id=321)
-		items.create()
-		self.assertTrue(items is not None)
-		self.assertEqual(items.order_id, order.id)
-		self.assertEqual(items.item_id, 321)
+
 		# Test for loop Items create
 		info = {
 			"order_id": order.id,
