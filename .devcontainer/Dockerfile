@@ -21,6 +21,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
 
 # Added libraries for PostgreSQL
 RUN apt-get install -y gcc libpq-dev
+RUN apt-get install -y postgresql-client
 
 # Set up the Python development environment
 WORKDIR /app
