@@ -74,6 +74,38 @@ def get_order_by_id(order_id):
 	return jsonify(order.serialize()), status.HTTP_200_OK
 
 
+@app.route("/orders/<int:order_id>", methods=["PUT"])
+def update_order(order_id):
+	"""Update order by order id
+	TODO: check if target id == json id
+	Args:
+		order_id (int): the id of the order
+	"""
+	order:Order = Order.find(order_id)
+	if order:
+		order.update()
+		return make_response("", status.HTTP_200_OK)
+	else:
+		return make_response("", status.HTTP_204_NO_CONTENT)
+
+@app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["PUT"])
+def update_order_item(order_id, item_id):
+	"""Update items in order
+
+	Args:
+		order_id (int): the id of the order
+		item_id (int): the id of the order
+	"""
+	order:Order = Order.find(order_id)
+	if order:
+		items = Items.find_by_order_id(order_id)
+		for item in items:
+			if item.id == item_id:
+				item.update()
+		return make_response("", status.HTTP_200_OK)
+	else:
+		return make_response("", status.HTTP_204_NO_CONTENT)
+
 @app.route("/orders/<int:order_id>", methods=["DELETE"])
 def delete_order(order_id):
 	"""Delete order by order id

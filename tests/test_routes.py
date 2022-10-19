@@ -75,6 +75,44 @@ class TestYourResourceServer(TestCase):
 		resp = self.client.get("/")
 		self.assertEqual(resp.status_code, status.HTTP_200_OK)
 	
+	def test_update_order(self):
+		""" test update /orders/<int:order_id>"""
+		order = self._create_order(1, 1)[0]
+		order.create()
+
+		# upadte 
+		order.status = 1
+		response = self.client.put(f"{BASE_URL}/{order.id}", json=order.serialize())
+		self.assertEqual(response.status_code, status.HTTP_200_OK)
+		db_order = Order.find(order.id)
+		self.assertEqual(db_order.status, 1)
+
+	def test_update_order_item(self):
+		""" test update /orders/<int:order_id>/items/<int:item_id>"""
+		orders = self._create_order(2, 0)
+		org_order = orders[0]
+		altered_order = orders[1]
+		org_order.create()
+		altered_order.create()
+		
+		item1 = Items(order_id=org_order.id, item_id=1)
+		item1.create()
+
+		# upadte item
+		item1.order_id = altered_order.id
+		response = self.client.put(f"{BASE_URL}/{org_order.id}/items/{item1.item_id}", json=item1.serialize())
+		self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+		# not exist in original order
+		db_items = Items.find_by_order_id(org_order.id)
+		id_list = [it.item_id for it in db_items]
+		self.assertFalse(item1.item_id in id_list)
+
+		# exist in new order
+		db_items = Items.find_by_order_id(altered_order.id)
+		id_list = [it.item_id for it in db_items]
+		self.assertTrue(item1.item_id in id_list)
+		
 	def test_delete_order(self):
 		""" test Delete /orders/<int:order_id>"""
 		order = self._create_order(1, 1)[0]
