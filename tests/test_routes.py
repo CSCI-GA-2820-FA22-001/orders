@@ -9,6 +9,8 @@ import os
 import logging
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
+
+from flask import jsonify
 from service import app
 from service.models import db, Order, Items
 from service.common import status  # HTTP Status Codes
@@ -106,14 +108,18 @@ class TestYourResourceServer(TestCase):
 
 	def test_create_order(self):
 		""" It should Create a new Order"""
+		info = {
+			"user_id": 0,
+			"create_time": "2021/03/16 16:30:00",
+			"status": 0,
+			"items": [1,2,3]
+		}
 		test_order = Order()
-		test_order.user_id = 0
-		test_order.create_time = "2021/03/16 16:30:00"
-		test_order.status = 0
+		test_order = test_order.deserialize(info)
 		test_order.create()
 
 		logging.debug("Test Order: %s", test_order.serialize())
-		response = self.client.post(BASE_URL, json=test_order.serialize())
+		response = self.client.post(BASE_URL, json=info)
 		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 		# Check the data is correct
@@ -121,6 +127,20 @@ class TestYourResourceServer(TestCase):
 		self.assertEqual(new_order["user_id"], test_order.user_id)
 		self.assertEqual(new_order["create_time"], test_order.create_time)
 		self.assertEqual(new_order["status"], test_order.status)
+
+		# Test for loop Items create
+
+		for item_id in jsonify(info).get_json().get("items"):
+			items = Items()
+			items.order_id = test_order.id
+			items.item_id = item_id
+			items.create()
+		found = Items.find_by_order_id(test_order.id)
+		item_list = [item for item in found]
+		count = len(item_list)
+		self.assertEqual(count, 3)
+		self.assertEqual(found[2].order_id, test_order.id)
+		self.assertEqual(found[2].item_id, 3)
 	
 	def test_add_order_item(self):
 		""" It should add an item to the order"""

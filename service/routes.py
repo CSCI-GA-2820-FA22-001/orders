@@ -41,12 +41,14 @@ def create_order():
 	order.create()
 	# return a message
 	message = order.serialize()
+	message["items"] = []
 	
-	for item_id in request.get_json().get("items",[]):
+	for item_id in request.get_json().get("items"):
 		items = Items()
 		items.order_id = order.id
 		items.item_id = item_id
 		items.create()
+		message["items"].append(item_id)
 
 
 
