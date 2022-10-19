@@ -236,18 +236,5 @@ class Items(db.Model):
 			Args:
 				by_order_id (int): the order id of the order items you want to match
 			"""
-<<<<<<< HEAD
 			logger.info("Processing order_id query for %d ...", by_order_id)
 			return cls.query.filter(cls.order_id == by_order_id)
-=======
-			logger.info("Processing name query for %s ...", name)
-			return cls.query.filter(cls.name == name)
-		
-		@classmethod
-		def find_by_order_id(cls, order_id):
-			"""
-			Find all items with order_id
-			"""
-			logger.info("Processing order_id of item query for %s ...", order_id)
-			return cls.query.filter(Items.order_id == order_id)
->>>>>>> origin/deleteAPIs
