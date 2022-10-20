@@ -9,7 +9,7 @@ import logging
 from typing import List
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from .common import status  # HTTP Status Codes
-from service.models import Order, Items
+from service.models import Order, Items, DataValidationError
 
 # Import Flask application
 from . import app
@@ -34,23 +34,28 @@ def create_order():
 		"item": [id1, id2, ...]
 	}
 	"""
+	json_data = request.get_json()
 	app.logger.info("Request create an order")
 	check_content_type("application/json")
 	order = Order()
-	order.deserialize(request.get_json())
+	order.deserialize(json_data)
 	order.create()
 	# return a message
 	message = order.serialize()
 	message["items"] = []
 	
-	for item_id in request.get_json().get("items"):
-		items = Items()
-		items.order_id = order.id
-		items.item_id = item_id
-		items.create()
-		message["items"].append(item_id)
-
-
+	if json_data is not None:
+		if json_data.get("items") is not None and isinstance(json_data["items"], list):
+			for item_id in json_data.get("items"):
+				items = Items()
+				items.order_id = order.id
+				items.item_id = item_id
+				items.create()
+				message["items"].append(item_id)
+		else:
+			raise DataValidationError(
+					"Invalid type for int list [items]"
+				)
 
 	location_url = url_for("create_order", order_id=order.id, _external=True)
 	return make_response(
@@ -69,9 +74,15 @@ def get_order_by_id(order_id):
 	order = Order.find(order_id)
 	if not order:
 		abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{order_id}' was not found.")
-		
+	
+	order_data = order.serialize()
+	order_data["items"] = []
+	items = Items.find_by_order_id(order_id)
+	for item in items:
+		order_data["items"].append(item.item_id)
+
 	app.logger.info("Returning pet: %s", order.id)
-	return jsonify(order.serialize()), status.HTTP_200_OK
+	return jsonify(order_data), status.HTTP_200_OK
 
 
 @app.route("/orders/<int:order_id>", methods=["PUT"])
@@ -100,9 +111,27 @@ def update_order_item(order_id, item_id):
 	if order:
 		items = Items.find_by_order_id(order_id)
 		for item in items:
-			if item.id == item_id:
+			if item.item_id == item_id:
 				item.update()
 		return make_response("", status.HTTP_200_OK)
+	else:
+		return make_response("", status.HTTP_204_NO_CONTENT)
+
+@app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["GET"])
+def get_order_item(order_id, item_id):
+	"""Get items in order
+
+	Args:
+		order_id (int): the id of the order
+		item_id (int): the id of the order
+	"""
+	order = Order.find(order_id)
+	if order:
+		items = Items.find_by_order_id(order_id)
+		for item in items:
+			if item.item_id == item_id:
+				return make_response("item exist in order", status.HTTP_200_OK)
+		return make_response("item not exist in order", status.HTTP_204_NO_CONTENT)
 	else:
 		return make_response("", status.HTTP_204_NO_CONTENT)
 

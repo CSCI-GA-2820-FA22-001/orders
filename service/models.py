@@ -245,4 +245,4 @@ class Items(db.Model):
 			Find all items with order_id
 			"""
 			logger.info("Processing order_id of item query for %s ...", order_id)
-			return cls.query.filter(Items.order_id == order_id)
+			return cls.query.filter(cls.order_id == order_id)

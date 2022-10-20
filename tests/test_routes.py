@@ -112,7 +112,21 @@ class TestYourResourceServer(TestCase):
 		db_items = Items.find_by_order_id(altered_order.id)
 		id_list = [it.item_id for it in db_items]
 		self.assertTrue(item1.item_id in id_list)
+
+	def test_get_order_item(self):
+		""" test update /orders/<int:order_id>/items/<int:item_id>"""
+		orders = self._create_order(2, 0)
+		org_order = orders[0]
+		altered_order = orders[1]
+		org_order.create()
+		altered_order.create()
 		
+		item1 = Items(order_id=org_order.id, item_id=1)
+		item1.create()
+
+		response = self.client.get(f"{BASE_URL}/{org_order.id}/items/{item1.item_id}", json=item1.serialize())
+		self.assertEqual(response.status_code, status.HTTP_200_OK)
+
 	def test_delete_order(self):
 		""" test Delete /orders/<int:order_id>"""
 		order = self._create_order(1, 1)[0]
