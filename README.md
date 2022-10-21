@@ -23,14 +23,14 @@ This project template contains starter code for your class project. The `/servic
 - ```GET /orders/{order_id}```:  
   * order_id (int): the order id that the user wants to get information about.
   
-- ```GET /orders/{order_id}/items/{item_id}```:  
-  * order_id (int): the order id which include the item that the user wants to get information about.
-  * item_id (int): the item id of the item that the user wants to get information about.
-  
 - ```DELETE /orders/{order_id}/items/{item_id}```:  
   * order_id (int): the order id item from which the user wants to delete from.
   * item_id (int): the item id of the item that the user wants to delete.
 
+- ```GET /orders/{order_id}/items/{item_id}```:  
+  * order_id (int): the order id which include the item that the user wants to get information about.
+  * item_id (int): the item id of the item that the user wants to get information about.
+ 
 - ```DELETE /orders/{order_id}```:  
   * order_id (int): the order id of the item that the user want to delete.
 
