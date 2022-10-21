@@ -232,3 +232,28 @@ class TestItemsModel(unittest.TestCase):
 		item.item_id = 10
 		item.update()
 		self.assertEqual(Items.find(item.id).item_id, 10)
+	
+	def test_deserialize_item(self):
+		"""test deserialize order"""
+		item = Items()
+		init_dict = {"order_id": 123, "item_id": 999}
+		bad_dic_1 = {"order_id": 123}
+		bad_dic_2 = {"item_id": 123}
+		bad_dic_3 = {"order_id": "bad order_id", "item_id": 999}
+		bad_dic_4 = {"order_id": 123, "item_id": "bad item_id"}
+		bad_dic_5 = {"order_id": "bad order_id", "item_id": "bad item_id"}
+
+		with self.assertRaises(DataValidationError):
+			item.deserialize(bad_dic_1)
+		with self.assertRaises(DataValidationError):
+			item.deserialize(bad_dic_2)
+		with self.assertRaises(DataValidationError):
+			item.deserialize(bad_dic_3)
+		with self.assertRaises(DataValidationError):
+			item.deserialize(bad_dic_4)
+		with self.assertRaises(DataValidationError):
+			item.deserialize(bad_dic_5)
+
+		updated_item = item.deserialize(init_dict)
+		self.assertEqual(updated_item.order_id, 123)
+		self.assertEqual(updated_item.item_id, 999)
