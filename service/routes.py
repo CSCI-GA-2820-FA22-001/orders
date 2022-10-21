@@ -3,22 +3,20 @@ My Service
 
 Describe what your service does here
 """
-from crypt import methods
-from email.policy import HTTP
 import logging
-from typing import List
-from flask import Flask, jsonify, request, url_for, make_response, abort
+from flask import jsonify, request, url_for, make_response, abort
 from .common import status  # HTTP Status Codes
-from service.models import Order, Items, DataValidationError
-
+from service.models import Order, Items
 # Import Flask application
 from . import app
-import json
+
 logger = logging.getLogger("flask.app")
 
 ######################################################################
 # GET INDEX
 ######################################################################
+
+
 @app.route("/", methods=["GET"])
 def index():
 	""" Root URL response """
@@ -26,6 +24,7 @@ def index():
 		"Home Page",
 		status.HTTP_200_OK,
 	)
+
 
 @app.route("/orders", methods=["POST"])
 def create_order():
@@ -89,12 +88,13 @@ def update_order(order_id):
 	Args:
 		order_id (int): the id of the order
 	"""
-	order:Order = Order.find(order_id)
+	order: Order = Order.find(order_id)
 	if order:
 		order.update()
 		return make_response("", status.HTTP_200_OK)
 	else:
 		return make_response("", status.HTTP_204_NO_CONTENT)
+
 
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["PUT"])
 def update_order_item(order_id, item_id):
@@ -104,7 +104,7 @@ def update_order_item(order_id, item_id):
 		order_id (int): the id of the order
 		item_id (int): the id of the order
 	"""
-	order:Order = Order.find(order_id)
+	order: Order = Order.find(order_id)
 	if order:
 		items = Items.find_by_order_id(order_id)
 		for item in items:
@@ -113,6 +113,7 @@ def update_order_item(order_id, item_id):
 		return make_response("", status.HTTP_200_OK)
 	else:
 		return make_response("", status.HTTP_204_NO_CONTENT)
+
 
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["GET"])
 def get_order_item(order_id, item_id):
@@ -132,10 +133,11 @@ def get_order_item(order_id, item_id):
 	else:
 		return make_response("", status.HTTP_204_NO_CONTENT)
 
+
 @app.route("/orders/<int:order_id>", methods=["DELETE"])
 def delete_order(order_id):
-	"""Delete order by order id
-
+	"""
+	Delete order by order id
 	Args:
 		order_id (int): the id of the order
 	"""
@@ -143,12 +145,14 @@ def delete_order(order_id):
 	if order:
 		order.delete()
 	return make_response("", status.HTTP_204_NO_CONTENT)
+
+
 @app.route("/orders/<int:order_id>/items", methods=["POST"])
 def add_order_item(order_id):
 	"""Add item to order by id
 
 	Keyword arguments:
-        order_id -- the id of the order
+		order_id -- the id of the order
 	"""
 	app.logger.info("Request add an item to order: %s", order_id)
 	check_content_type("application/json")
@@ -161,9 +165,7 @@ def add_order_item(order_id):
 		message = item.serialize()
 	else:
 		message = ""
-	return make_response(jsonify(message),status.HTTP_201_CREATED)
-
-
+	return make_response(jsonify(message), status.HTTP_201_CREATED)
 	
 
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["DELETE"])
@@ -185,6 +187,7 @@ def init_db():
 	""" Initializes the SQLAlchemy app """
 	global app
 	Order.init_db(app)
+
 
 def check_content_type(media_type):
 	""" Reference: https://github.com/nyu-devops/sample-accounts/blob/master/service/routes.py """
