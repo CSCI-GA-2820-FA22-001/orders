@@ -20,6 +20,8 @@ This project template contains starter code for your class project. The `/servic
 4. Run the app by ```flask run``` or ```honcho start```
 
 ## RESTful APIs
+- ```POST /orders```
+
 - ```GET /orders``` 
 
 - ```GET /orders/{order_id}```:  
@@ -28,6 +30,9 @@ This project template contains starter code for your class project. The `/servic
 - ```DELETE /orders/{order_id}/items/{item_id}```:  
   * order_id (int): the order id item from which the user wants to delete from.
   * item_id (int): the item id of the item that the user wants to delete.
+
+- ```POST /orders{order_id}/items```
+  * order_id (int): the order id where the user wants to add items
 
 - ```GET /orders/{order_id}/items``` 
 
