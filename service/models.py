@@ -4,13 +4,12 @@ Models for YourResourceModel
 All of the models are stored in this module
 """
 import logging
-from typing_extensions import assert_type
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from flask_migrate import Migrate
 from sqlalchemy import ForeignKey
 from service import app
-import json
+
 logger = logging.getLogger("flask.app")
 
 # Create the SQLAlchemy object to be initialized later in init_db()
@@ -74,9 +73,9 @@ class Order(db.Model):
 		Args:
 			data (dict): A dictionary containing the resource data
 		"""
-		try: 
+		try:
 			if isinstance(data["user_id"], int):
-					self.user_id = data["user_id"]
+				self.user_id = data["user_id"]
 			else:
 				raise DataValidationError(
 					"Invalid type for int [user_id]: "
@@ -239,7 +238,7 @@ class Items(db.Model):
 		# 	"""
 		# 	logger.info("Processing name query for %s ...", name)
 		# 	return cls.query.filter(cls.name == name)
-		
+
 		@classmethod
 		def find_by_order_id(cls, order_id):
 			"""
