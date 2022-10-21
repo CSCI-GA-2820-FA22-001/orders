@@ -229,15 +229,15 @@ class Items(db.Model):
 			logger.info("Processing lookup for id %s ...", by_id)
 			return cls.query.get(by_id)
 
-		@classmethod
-		def find_by_name(cls, name):
-			"""Returns all YourResourceModels with the given name
+		# @classmethod
+		# def find_by_name(cls, name):
+		# 	"""Returns all YourResourceModels with the given name
 
-			Args:
-				name (string): the name of the YourResourceModels you want to match
-			"""
-			logger.info("Processing name query for %s ...", name)
-			return cls.query.filter(cls.name == name)
+		# 	Args:
+		# 		name (string): the name of the YourResourceModels you want to match
+		# 	"""
+		# 	logger.info("Processing name query for %s ...", name)
+		# 	return cls.query.filter(cls.name == name)
 		
 		@classmethod
 		def find_by_order_id(cls, order_id):

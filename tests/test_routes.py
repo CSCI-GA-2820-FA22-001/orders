@@ -12,7 +12,7 @@ from unittest.mock import MagicMock, patch
 
 from flask import jsonify
 from service import app
-from service.models import db, Order, Items
+from service.models import db, Order, Items, DataValidationError
 from service.common import status  # HTTP Status Codes
 from .factories import create_random_time_str
 
@@ -100,6 +100,8 @@ class TestYourResourceServer(TestCase):
 
 		# upadte item
 		item1.order_id = altered_order.id
+		response = self.client.put(f"{BASE_URL}/100000/items/{item1.item_id}", json=item1.serialize())
+		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 		response = self.client.put(f"{BASE_URL}/{org_order.id}/items/{item1.item_id}", json=item1.serialize())
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -126,6 +128,12 @@ class TestYourResourceServer(TestCase):
 
 		response = self.client.get(f"{BASE_URL}/{org_order.id}/items/{item1.item_id}", json=item1.serialize())
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+		response = self.client.get(f"{BASE_URL}/{org_order.id}/items/10000", json=item1.serialize())
+		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+		response = self.client.get(f"{BASE_URL}/100000/items/{item1.item_id}", json=item1.serialize())
+		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 	def test_delete_order(self):
 		""" test Delete /orders/<int:order_id>"""
@@ -157,6 +165,31 @@ class TestYourResourceServer(TestCase):
 		found = Items.find_by_order_id(order_id=order1.id)
 		count = len([item for item in found])
 		self.assertEqual(count, 1)
+
+	def test_get_order(self):
+		""" It should Get the Order with the order_id"""
+		info = {
+			"user_id": 0,
+			"create_time": "2021/03/16 16:30:00",
+			"status": 0,
+			"items": [1,2,3]
+		}
+
+		response = self.client.post(BASE_URL, json=info)
+		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+		test_id = response.get_json().get("id")
+		response = self.client.get(f"{BASE_URL}/{test_id}")
+		self.assertEqual(response.status_code, status.HTTP_200_OK)
+		new_order = response.get_json()
+		self.assertEqual(new_order["user_id"], info["user_id"])
+		self.assertEqual(new_order["create_time"], info["create_time"])
+		self.assertEqual(new_order["status"], info["status"])
+		self.assertEqual(new_order.get("items"), info["items"])
+
+		response = self.client.get(f"{BASE_URL}/10000")
+		self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
 
 	def test_create_order(self):
 		""" It should Create a new Order"""
