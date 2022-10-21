@@ -52,10 +52,6 @@ def create_order():
 				items.item_id = item_id
 				items.create()
 				message["items"].append(item_id)
-		else:
-			raise DataValidationError(
-					"Invalid type for int list [items]"
-				)
 
 	location_url = url_for("create_order", order_id=order.id, _external=True)
 	return make_response(
@@ -73,7 +69,7 @@ def get_order_by_id(order_id):
 	app.logger.info("Request for pet with id: %s", order_id)
 	order = Order.find(order_id)
 	if not order:
-		abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{order_id}' was not found.")
+		abort(status.HTTP_404_NOT_FOUND, f"Order with id '{order_id}' was not found.")
 	
 	order_data = order.serialize()
 	order_data["items"] = []
@@ -82,7 +78,8 @@ def get_order_by_id(order_id):
 		order_data["items"].append(item.item_id)
 
 	app.logger.info("Returning pet: %s", order.id)
-	return jsonify(order_data), status.HTTP_200_OK
+	# return jsonify(order_data), status.HTTP_200_OK
+	return make_response(jsonify(order_data), status.HTTP_200_OK)
 
 
 @app.route("/orders/<int:order_id>", methods=["PUT"])
