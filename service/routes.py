@@ -26,6 +26,32 @@ def index():
 	)
 
 
+@app.route("/orders", methods=["GET"])
+def list_orders():
+	"""List all orders
+	
+	Keyword arguments:
+	user_id -- the unique id representing a user
+	Return: all orders owned by user with user_id
+	"""
+
+	app.logger.info("Request listing orders")
+	# TODO: how is parameter user_id passed?
+	args = request.args
+	user_id = args.get("user_id", type=int)
+	if user_id is None:
+		abort(
+			status.HTTP_401_UNAUTHORIZED,
+			"Unauthorized user for unknown user_id.",
+		)
+	
+	orders = Order.find_by_user_id(user_id)
+	return make_response(
+		jsonify([order.serialize() for order in orders]), 
+		status.HTTP_200_OK,
+	)
+
+
 @app.route("/orders", methods=["POST"])
 def create_order():
 	"""Create an order
@@ -145,6 +171,19 @@ def delete_order(order_id):
 	if order:
 		order.delete()
 	return make_response("", status.HTTP_204_NO_CONTENT)
+
+
+@app.route("/orders/<int:order_id>/items", methods=["GET"])
+def list_order_items(order_id):
+	"""List order items by order id
+	Args:
+		order_id (int): the unique id representing an order
+	Returns:
+		list[items]: a list of items in that order
+	"""
+
+	items = Items.find_by_order_id(order_id)
+	return make_response(jsonify([item.serialize() for item in items]), status.HTTP_200_OK)
 
 
 @app.route("/orders/<int:order_id>/items", methods=["POST"])
