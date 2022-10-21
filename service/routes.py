@@ -180,11 +180,6 @@ def list_order_items(order_id):
 	Returns:
 		list[items]: a list of items in that order
 	"""
-	if order_id < 0:
-		abort(
-			status.HTTP_400_BAD_REQUEST,
-			f"order id {order_id} should not be negative",
-		)
 
 	items = Items.find_by_order_id(order_id)
 	return make_response(jsonify([item.serialize() for item in items]), status.HTTP_200_OK)
