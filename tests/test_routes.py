@@ -5,6 +5,7 @@ Test cases can be run with the following:
   nosetests -v --with-spec --spec-color
   coverage report -m
 """
+from distutils.log import info
 import os
 import logging
 from unittest import TestCase
@@ -52,14 +53,18 @@ class TestYourResourceServer(TestCase):
 		db.session.remove()
 
 
-	def _create_order(self, count, user_id_incr = 0):
+	######################################################################
+	#  H E L P E R S   F U N C T I O N S   H E R E
+	######################################################################
+
+	def _create_order(self, count, user_id_begin = 0, user_id_incr = 0):
 		"""Factory method to create orders in bulk
 		param:
 			count -> int: represent how many orders you want to generate
 			user_id_incr -> int: what is the difference between previous user id and next user id
 		"""
 		orders = []
-		user_id = 0
+		user_id = user_id_begin
 		for _ in range(count):
 			order = Order(user_id=user_id, create_time=create_random_time_str(), status=0)
 			orders.append(order)
@@ -77,7 +82,7 @@ class TestYourResourceServer(TestCase):
 	
 	def test_update_order(self):
 		""" test update /orders/<int:order_id>"""
-		order = self._create_order(1, 1)[0]
+		order = self._create_order(count=1, user_id_incr=1)[0]
 		order.create()
 
 		# upadte 
@@ -89,7 +94,7 @@ class TestYourResourceServer(TestCase):
 
 	def test_update_order_item(self):
 		""" test update /orders/<int:order_id>/items/<int:item_id>"""
-		orders = self._create_order(2, 0)
+		orders = self._create_order(count=2, user_id_incr=0)
 		org_order = orders[0]
 		altered_order = orders[1]
 		org_order.create()
@@ -115,7 +120,7 @@ class TestYourResourceServer(TestCase):
 		
 	def test_delete_order(self):
 		""" test Delete /orders/<int:order_id>"""
-		order = self._create_order(1, 1)[0]
+		order = self._create_order(count=1, user_id_incr=1)[0]
 		order.create()
 		response = self.client.delete(f"{BASE_URL}/{order.id}")
 		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -200,4 +205,40 @@ class TestYourResourceServer(TestCase):
 		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 		self.assertTrue(""==response.get_json())
 
+	def test_list_orders(self):
+		""" It should list existing orders """
+		orders = self._create_order(count=2, user_id_begin=0, user_id_incr=0)
+		order_excep = self._create_order(count=1, user_id_begin=1, user_id_incr=0)
+
+		for order in orders:
+			order.create()
+		for order in order_excep:
+			order.create()
+
+		resp = self.client.get(BASE_URL)
+		self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
+		data = resp.get_json()
+		self.assertIsNone(data)
+
+		resp = self.client.get(BASE_URL, query_string="user_id=0")
+		self.assertEqual(resp.status_code, status.HTTP_200_OK)
+		data = resp.get_json()
+		self.assertIsNotNone(data)
+		self.assertEqual(len(data), 2)
+
+	def test_list_order_items(self):
+		""" It should list the items in an order"""            
+		order = self._create_order(count=1, user_id_begin=0, user_id_incr=0)
+		for o in order:
+			o.create()
+		item1 = Items(order_id=order[0].id, item_id=1)
+		item1.create()
+		item2 = Items(order_id=order[0].id, item_id=2)
+		item2.create()
+
+		resp = self.client.get(f"{BASE_URL}/{order[0].id}/items")
+		self.assertEqual(resp.status_code, status.HTTP_200_OK)
+		data = resp.get_json()
+		self.assertIsNotNone(data)
+		self.assertEqual(len(data), 2)
 	

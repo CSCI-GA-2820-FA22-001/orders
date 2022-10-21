@@ -135,6 +135,7 @@ class Order(db.Model):
 		logger.info("Processing name query for %s ...", user_id)
 		return cls.query.filter(cls.user_id == user_id)
 
+
 class Items(db.Model):
 		"""
 		Class that represents a Item-Order matching Model

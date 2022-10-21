@@ -27,6 +27,33 @@ def index():
 		status.HTTP_200_OK,
 	)
 
+
+@app.route("/orders", methods=["GET"])
+def list_orders():
+	"""List all orders
+	
+	Keyword arguments:
+	user_id -- the unique id representing a user
+	Return: all orders owned by user with user_id
+	"""
+
+	app.logger.info("Request listing orders")
+	# TODO: how is parameter user_id passed?
+	args = request.args
+	user_id = args.get("user_id", type=int)
+	if user_id is None:
+		abort(
+			status.HTTP_401_UNAUTHORIZED,
+			"Unauthorized user for unknown user_id.",
+		)
+	
+	orders = Order.find_by_user_id(user_id)
+	return make_response(
+		jsonify([order.serialize() for order in orders]), 
+		status.HTTP_200_OK,
+	)
+
+
 @app.route("/orders", methods=["POST"])
 def create_order():
 	"""Create an order
@@ -49,8 +76,6 @@ def create_order():
 		items.item_id = item_id
 		items.create()
 		message["items"].append(item_id)
-
-
 
 	location_url = url_for("create_order", order_id=order.id, _external=True)
 	return make_response(
@@ -117,12 +142,32 @@ def delete_order(order_id):
 	if order:
 		order.delete()
 	return make_response("", status.HTTP_204_NO_CONTENT)
+
+
+@app.route("/orders/<int:order_id>/items", methods=["GET"])
+def list_order_items(order_id):
+	"""List order items by order id
+	Args:
+		order_id (int): the unique id representing an order
+	Returns:
+		list[items]: a list of items in that order
+	"""
+	if order_id < 0:
+		abort(
+			status.HTTP_400_BAD_REQUEST,
+			f"order id {order_id} should not be negative",
+		)
+
+	items = Items.find_by_order_id(order_id)
+	return make_response(jsonify([item.serialize() for item in items]), status.HTTP_200_OK)
+
+
 @app.route("/orders/<int:order_id>/items", methods=["POST"])
 def add_order_item(order_id):
 	"""Add item to order by id
 
 	Keyword arguments:
-        order_id -- the id of the order
+		order_id -- the id of the order
 	"""
 	app.logger.info("Request add an item to order: %s", order_id)
 	check_content_type("application/json")
@@ -136,8 +181,6 @@ def add_order_item(order_id):
 	else:
 		message = ""
 	return make_response(jsonify(message),status.HTTP_201_CREATED)
-
-
 	
 
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["DELETE"])
