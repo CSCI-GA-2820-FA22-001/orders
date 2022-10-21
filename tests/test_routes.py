@@ -252,6 +252,7 @@ class TestYourResourceServer(TestCase):
 		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 		self.assertTrue(""==response.get_json())
 
+
 	def test_list_orders(self):
 		""" It should list existing orders """
 		orders = self._create_order(count=2, user_id_begin=0, user_id_incr=0)
@@ -272,6 +273,7 @@ class TestYourResourceServer(TestCase):
 		data = resp.get_json()
 		self.assertIsNotNone(data)
 		self.assertEqual(len(data), 2)
+
 
 	def test_list_order_items(self):
 		""" It should list the items in an order"""            

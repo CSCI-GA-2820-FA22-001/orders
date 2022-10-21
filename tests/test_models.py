@@ -176,6 +176,7 @@ class TestItemsModel(unittest.TestCase):
 		app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
 		app.logger.setLevel(logging.CRITICAL)
 		Order.init_db(app)
+		Items.init_db(app)
 
 	@classmethod
 	def tearDownClass(cls):
@@ -257,3 +258,18 @@ class TestItemsModel(unittest.TestCase):
 		updated_item = item.deserialize(init_dict)
 		self.assertEqual(updated_item.order_id, 123)
 		self.assertEqual(updated_item.item_id, 999)
+	
+
+	def test_item_all(self):
+		"""test all item function"""
+		order1 = Order(user_id=123, create_time="2021-10-10", status=1)
+		order1.create()
+		item1 = Items(order_id=order1.id, item_id= 1)
+		item2 = Items(order_id=order1.id, item_id =2)
+		item3 = Items(order_id=order1.id, item_id =2)
+		item1.create()
+		item2.create()
+		item3.create()
+		found = Items.all()
+		self.assertEqual(len([item for item in found]), 3)
+
