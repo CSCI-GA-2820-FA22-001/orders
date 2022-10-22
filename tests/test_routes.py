@@ -85,18 +85,29 @@ class TestYourResourceServer(TestCase):
 		order = self._create_order(count=1, user_id_incr=1)[0]
 		order.create()
 
-		# upadte 
-		order.status = 1
-		response = self.client.put(f"{BASE_URL}/{order.id}", json=order.serialize())
+		# update
+		updated_order = self._create_order(count=1, user_id_incr=1)[0]
+		updated_order.status = 1
+
+		db_order = Order.find(order.id)
+		self.assertEqual(db_order.status, 0)
+		response = self.client.put(f"{BASE_URL}/{order.id}", json=updated_order.serialize())
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
 		db_order = Order.find(order.id)
 		self.assertEqual(db_order.status, 1)
 
+		# update an order that is not in database
+		not_in_db_order = self._create_order(count=1, user_id_begin=100000001)[0]
+		not_in_db_order.id = 100000001
+
+		response = self.client.put(f"{BASE_URL}/{not_in_db_order.id}", json=not_in_db_order.serialize())
+		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
 	def test_update_order_item(self):
 		""" test update /orders/<int:order_id>/items/<int:item_id>"""
-		orders = self._create_order(count=2, user_id_incr=0)
-		org_order = orders[0]
-		altered_order = orders[1]
+		# orders = self._create_order(count=1, user_id_incr=0)[0]
+		org_order = self._create_order(count=1, user_id_incr=0)[0]
+		altered_order = self._create_order(count=1, user_id_incr=0)[0]
 		org_order.create()
 		altered_order.create()
 		
@@ -104,10 +115,14 @@ class TestYourResourceServer(TestCase):
 		item1.create()
 
 		# upadte item
-		item1.order_id = altered_order.id
-		response = self.client.put(f"{BASE_URL}/100000/items/{item1.item_id}", json=item1.serialize())
+		updated_item1 = Items(order_id=altered_order.id, item_id=1)
+		
+		response = self.client.put(f"{BASE_URL}/10000000/items/{item1.item_id}", json=updated_item1.serialize())
 		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-		response = self.client.put(f"{BASE_URL}/{org_order.id}/items/{item1.item_id}", json=item1.serialize())
+		response = self.client.put(f"{BASE_URL}/{org_order.id}/items/1000000", json=updated_item1.serialize())
+		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+		response = self.client.put(f"{BASE_URL}/{org_order.id}/items/{item1.item_id}", json=updated_item1.serialize())
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 		# not exist in original order

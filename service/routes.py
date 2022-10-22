@@ -116,6 +116,7 @@ def update_order(order_id):
 	"""
 	order: Order = Order.find(order_id)
 	if order:
+		order.deserialize(request.get_json())
 		order.update()
 		return make_response("", status.HTTP_200_OK)
 	else:
@@ -135,8 +136,10 @@ def update_order_item(order_id, item_id):
 		items = Items.find_by_order_id(order_id)
 		for item in items:
 			if item.item_id == item_id:
+				item.deserialize(request.get_json())
 				item.update()
-		return make_response("", status.HTTP_200_OK)
+				return make_response("", status.HTTP_200_OK)
+		return make_response("", status.HTTP_204_NO_CONTENT)
 	else:
 		return make_response("", status.HTTP_204_NO_CONTENT)
 
