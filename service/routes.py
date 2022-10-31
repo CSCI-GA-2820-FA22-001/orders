@@ -120,7 +120,7 @@ def update_order(order_id):
 		order.update()
 		return make_response("", status.HTTP_200_OK)
 	else:
-		return make_response("", status.HTTP_204_NO_CONTENT)
+		return make_response("", status.HTTP_404_NOT_FOUND)
 
 
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["PUT"])
