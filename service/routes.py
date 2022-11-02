@@ -205,9 +205,10 @@ def add_order_item(order_id):
 		item.create()
 		# return a message
 		message = item.serialize()
+		return make_response(jsonify(message), status.HTTP_201_CREATED)
 	else:
-		message = ""
-	return make_response(jsonify(message), status.HTTP_201_CREATED)
+		message = "order not found"
+		return make_response(jsonify(message), status.HTTP_404_NOT_FOUND)
 	
 
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["DELETE"])

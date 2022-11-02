@@ -264,8 +264,8 @@ class TestYourResourceServer(TestCase):
 		self.assertEqual(new_item["item_id"], item1.item_id)
 
 		response = self.client.post(f"{BASE_URL}/{404}/items", json=item1.serialize())
-		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-		self.assertTrue(""==response.get_json())
+		self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+		self.assertTrue("order not found" == response.get_json())
 
 
 	def test_list_orders(self):
