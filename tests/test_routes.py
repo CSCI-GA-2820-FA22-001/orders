@@ -10,12 +10,14 @@ import os
 import logging
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
+from venv import create
 
 from flask import jsonify
 from service import app
-from service.models import db, Order, Items, DataValidationError
+from service.models import db, Order, Items, DataValidationError, Status
 from service.common import status  # HTTP Status Codes
 from .factories import create_random_time_str
+from time import time
 
 DATABASE_URI = os.getenv(
 	"DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
@@ -66,7 +68,7 @@ class TestYourResourceServer(TestCase):
 		orders = []
 		user_id = user_id_begin
 		for _ in range(count):
-			order = Order(user_id=user_id, create_time=create_random_time_str(), status=0)
+			order = Order(user_id=user_id, create_time= (int)(time()), status=Status.CREATED)
 			orders.append(order)
 			user_id += user_id_incr
 		return orders
@@ -87,21 +89,21 @@ class TestYourResourceServer(TestCase):
 
 		# update
 		updated_order = self._create_order(count=1, user_id_incr=1)[0]
-		updated_order.status = 1
+		updated_order.status = Status.CREATED
 
 		db_order = Order.find(order.id)
-		self.assertEqual(db_order.status, 0)
+		self.assertEqual(db_order.status, Status.CREATED)
 		response = self.client.put(f"{BASE_URL}/{order.id}", json=updated_order.serialize())
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
 		db_order = Order.find(order.id)
-		self.assertEqual(db_order.status, 1)
+		self.assertEqual(db_order.status, Status.CREATED)
 
 		# update an order that is not in database
 		not_in_db_order = self._create_order(count=1, user_id_begin=100000001)[0]
 		not_in_db_order.id = 100000001
 
 		response = self.client.put(f"{BASE_URL}/{not_in_db_order.id}", json=not_in_db_order.serialize())
-		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+		self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 	def test_update_order_item(self):
 		""" test update /orders/<int:order_id>/items/<int:item_id>"""
@@ -167,7 +169,7 @@ class TestYourResourceServer(TestCase):
 	
 	def test_delete_item(self):
 		""" test delete item by order id and item id"""
-		order1 = Order(user_id=123, create_time="2021-10-10", status=1)
+		order1 = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
 		order1.create()
 		item1 = Items(order_id=order1.id, item_id= 1)
 		item2 = Items(order_id=order1.id, item_id =2)
@@ -190,8 +192,8 @@ class TestYourResourceServer(TestCase):
 		""" It should Get the Order with the order_id"""
 		info = {
 			"user_id": 0,
-			"create_time": "2021/03/16 16:30:00",
-			"status": 0,
+			"create_time": (int)(time()),
+			"status": Status.CREATED,
 			"items": [1,2,3]
 		}
 
@@ -215,8 +217,8 @@ class TestYourResourceServer(TestCase):
 		""" It should Create a new Order"""
 		info = {
 			"user_id": 0,
-			"create_time": "2021/03/16 16:30:00",
-			"status": 0,
+			"create_time": (int)(time()),
+			"status": Status.CREATED,
 			"items": [1,2,3]
 		}
 		test_order = Order()
@@ -249,7 +251,7 @@ class TestYourResourceServer(TestCase):
 	
 	def test_add_order_item(self):
 		""" It should add an item to the order"""
-		order1 = Order(user_id=123, create_time="2021-10-10", status=1)
+		order1 = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
 		order1.create()
 		item1 = Items(order_id=order1.id, item_id= 1)
 		item1.create()
@@ -306,3 +308,5 @@ class TestYourResourceServer(TestCase):
 		self.assertIsNotNone(data)
 		self.assertEqual(len(data), 2)
 	
+	# def test_gg(self):
+	# 	order = Order(user_id=123, create_time=(int)(time()), status=1)

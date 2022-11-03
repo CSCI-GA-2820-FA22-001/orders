@@ -9,9 +9,9 @@ from flask import jsonify
 
 from importlib_metadata import metadata
 from service import app
-from service.models import Order, DataValidationError, db, Items
+from service.models import Order, DataValidationError, db, Items, Status
 from service.config import DATABASE_URI
-
+from time import time
 
 ######################################################################
 #  <your resource name>   M O D E L   T E S T   C A S E S
@@ -49,20 +49,21 @@ class TestOrderModel(unittest.TestCase):
 	def test_create_order(self):
 		""" It should always be true """
 		# Test constructor
-		order = Order(user_id=123, create_time="2022-10-16", status=1)
+		ts = (int)(time())
+		order = Order(user_id=123, create_time=ts, status=Status.CREATED)
 		order.create()
-		self.assertEqual(str(order), "<User 123 Create Time=2022-10-16 Status=1>")
+		self.assertEqual(str(order), f"<User 123 Create Time={ts} Status=1>")
 		self.assertTrue(order is not None)
 		self.assertEqual(order.user_id, 123)
-		self.assertEqual(order.create_time, "2022-10-16")
+		self.assertEqual(order.create_time, ts)
 		self.assertEqual(order.status, 1)
 		# Test create
 		db_order = Order.find(order.id)
-		self.assertEqual(str(db_order), "<User 123 Create Time=2022-10-16 Status=1>")
+		self.assertEqual(str(db_order), f"<User 123 Create Time={ts} Status=1>")
 		self.assertTrue(db_order is not None)
 		self.assertEqual(db_order.user_id, 123)
 		self.assertEqual(db_order.id, order.id)
-		self.assertEqual(db_order.create_time, "2022-10-16")
+		self.assertEqual(db_order.create_time, ts)
 		self.assertEqual(db_order.status, 1)
 
 		# Test for loop Items create
@@ -87,7 +88,7 @@ class TestOrderModel(unittest.TestCase):
 
 	def test_delete_order(self):
 		"""test delete function in Order"""
-		order = Order(user_id=123, create_time="2022-10-16", status=1)
+		order = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
 		order.create()
 		order_id = order.id
 		order.delete()
@@ -96,33 +97,35 @@ class TestOrderModel(unittest.TestCase):
 
 	def test_update_order(self):
 		"""test update function in Order"""
-		order = Order(user_id=123, create_time="2022-10-16", status=1)
+		ts = (int)(time())
+		order = Order(user_id=123, create_time=ts, status=Status.CREATED)
 		order.create()
 		order.user_id = 234
-		order.create_time = "2021-1-2"
-		order.status = 0
+		ts1 = (int)(time())
+		order.create_time = ts1
+		order.status = Status.CANCELLED
 		order.update()
 		db_order = Order.find(order.id)
 		self.assertTrue(db_order is not None)
 		self.assertEqual(db_order.user_id, 234)
-		self.assertEqual(db_order.create_time, "2021-1-2")
-		self.assertEqual(db_order.status, 0)
+		self.assertEqual(db_order.create_time, ts1)
+		self.assertEqual(db_order.status, Status.CANCELLED)
 
 	def test_serialize_order(self):
 		"""test serialize"""
-		order = Order(user_id=123, create_time="2022-10-16", status=1)
-		test_dict = {"id": None, "user_id": 123, "create_time": "2022-10-16", "status": 1}
+		order = Order(user_id=123, create_time="2022-10-16", status=Status.CREATED)
+		test_dict = {"id": None, "user_id": 123, "create_time": "2022-10-16", "status": Status.CREATED}
 		self.assertEqual(order.serialize(), test_dict)
 
 	def test_deserialize_order(self):
 		"""test deserialize order"""
 		order = Order()
-		init_dict = {"user_id": 123, "create_time": "2021-10-16", "status": 0}
+		init_dict = {"user_id": 123, "create_time": 20140103, "status": Status.CREATED}
 		bad_dic_1 = {"user_id": 123, "create_time": "2021-10-16"}
-		bad_dic_2 = {"create_time": "2021-10-16", "status": 0}
-		bad_dic_3 = {"user_id": 123, "status": 0}
+		bad_dic_2 = {"create_time": "2021-10-16", "status": Status.CREATED}
+		bad_dic_3 = {"user_id": 123, "status": Status.CREATED}
 		bad_dic_4 = {"user_id": "bad userid", "create_time": 20140103, "status": "bad status"}
-		bad_dic_5 = {"user_id": 123, "create_time": 20140103, "status": 0}
+		bad_dic_5 = {"user_id": 123, "create_time": "2021-10-16", "status": Status.CREATED}
 		bad_dic_6 = {"user_id": 123, "create_time": "2021-10-16", "status": "bad status"}
 		with self.assertRaises(DataValidationError):
 			order.deserialize(bad_dic_1)
@@ -138,15 +141,15 @@ class TestOrderModel(unittest.TestCase):
 			order.deserialize(bad_dic_6)
 		updated_order = order.deserialize(init_dict)
 		self.assertEqual(updated_order.user_id, 123)
-		self.assertEqual(updated_order.create_time, "2021-10-16")
-		self.assertEqual(updated_order.status, 0)
+		self.assertEqual(updated_order.create_time, 20140103)
+		self.assertEqual(updated_order.status, Status.CREATED)
 
 	def test_list_all_order(self):
-		"""test serialize"""
+		"""test list all order"""
 		self.assertEqual(Order.all(), [])
-		order1 = Order(user_id=123, create_time="2022-10-16", status=1)
-		order2 = Order(user_id=124, create_time="2022-10-6", status=1)
-		order3 = Order(user_id=125, create_time="2022-10-5", status=1)
+		order1 = Order(user_id=123, create_time=(int)(time()), status=1)
+		order2 = Order(user_id=124, create_time=(int)(time()), status=1)
+		order3 = Order(user_id=125, create_time=(int)(time()), status=1)
 		order1.create()
 		order2.create()
 		order3.create()
@@ -154,9 +157,9 @@ class TestOrderModel(unittest.TestCase):
 
 	def test_find_by_user_id(self):
 		"""test find by user id"""
-		order1 = Order(user_id=123, create_time="2022-10-16", status=1)
-		order2 = Order(user_id=123, create_time="2022-10-6", status=1)
-		order3 = Order(user_id=123, create_time="2022-10-5", status=1)
+		order1 = Order(user_id=123, create_time=(int)(time()), status=1)
+		order2 = Order(user_id=123, create_time=(int)(time()), status=1)
+		order3 = Order(user_id=123, create_time=(int)(time()), status=1)
 		order1.create()
 		order2.create()
 		order3.create()
@@ -199,7 +202,7 @@ class TestItemsModel(unittest.TestCase):
 	
 	def test_item_repr(self):
 		"""test item __repr__"""
-		order = Order(user_id=123, create_time="2021-10-10", status=1)
+		order = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
 		order.create()
 		item = Items(order_id=order.id, item_id= 1)
 		item.create()
@@ -207,13 +210,14 @@ class TestItemsModel(unittest.TestCase):
 
 	def test_item_find(self):
 		"""test item find"""
-		order1 = Order(user_id=123, create_time="2021-10-10", status=1)
-		order2 = Order(user_id=124, create_time="2021-10-11", status=1)
+		ts = (int)(time())
+		order1 = Order(user_id=123, create_time=ts, status=Status.CREATED)
+		order2 = Order(user_id=124, create_time=ts, status=Status.CREATED)
 		order1.create()
 		order2.create()
-		item1 = Items(order_id=order1.id, item_id= 1)
-		item2 = Items(order_id=order1.id, item_id =2)
-		item3 = Items(order_id=order2.id, item_id =2)
+		item1 = Items(order_id=order1.id, item_id = 1)
+		item2 = Items(order_id=order1.id, item_id = 2)
+		item3 = Items(order_id=order2.id, item_id = 2)
 		item1.create()
 		item2.create()
 		item3.create()
@@ -226,7 +230,7 @@ class TestItemsModel(unittest.TestCase):
 	
 	def test_item_update(self):
 		"""test item update"""
-		order = Order(user_id=123, create_time="2021-10-10", status=1)
+		order = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
 		order.create()
 		item = Items(order_id=order.id, item_id= 1)
 		item.create()
@@ -262,7 +266,7 @@ class TestItemsModel(unittest.TestCase):
 
 	def test_item_all(self):
 		"""test all item function"""
-		order1 = Order(user_id=123, create_time="2021-10-10", status=1)
+		order1 = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
 		order1.create()
 		item1 = Items(order_id=order1.id, item_id= 1)
 		item2 = Items(order_id=order1.id, item_id =2)

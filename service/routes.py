@@ -29,7 +29,7 @@ def index():
 @app.route("/orders", methods=["GET"])
 def list_orders():
 	"""List all orders
-	
+
 	Keyword arguments:
 	user_id -- the unique id representing a user
 	Return: all orders owned by user with user_id
