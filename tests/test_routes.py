@@ -307,6 +307,35 @@ class TestYourResourceServer(TestCase):
 		data = resp.get_json()
 		self.assertIsNotNone(data)
 		self.assertEqual(len(data), 2)
+
+
+	def test_cancel_order(self):
+		""" It should cancel an order """
+		order = self._create_order(count=1, user_id_begin=0, user_id_incr=0)[0]
+		order.create()
+		
+		resp = self.client.get(f"{BASE_URL}/{order.id}")
+		self.assertEqual(resp.status_code, status.HTTP_200_OK)
+		body = resp.get_json()
+		self.assertIsNotNone(body)
+		self.assertEqual(body["status"], Status.CREATED)
+
+		resp = self.client.post(f"{BASE_URL}/{order.id}/cancel")
+		self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+		resp = self.client.get(f"{BASE_URL}/{order.id}")
+		self.assertEqual(resp.status_code, status.HTTP_200_OK)
+		body = resp.get_json()
+		self.assertIsNotNone(body)
+		self.assertEqual(body["status"], Status.CANCELLED)
+
+		resp = self.client.post(f"{BASE_URL}/{order.id + 1}/cancel")
+		self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+		body = resp.get_json()
+		self.assertIsNone(body)
+
+
+
 	
 	# def test_gg(self):
 	# 	order = Order(user_id=123, create_time=(int)(time()), status=1)
