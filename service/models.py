@@ -243,3 +243,11 @@ class Items(db.Model):
 			"""
 			logger.info("Processing order_id of item query for %s ...", order_id)
 			return cls.query.filter(cls.order_id == order_id)
+
+		@classmethod
+		def find_by_item_id(cls, item_id):
+			"""
+			Find all order contains item
+			"""
+			logger.info("Processing order query by item for %s ...", item_id)
+			return cls.query.filter(cls.item_id == item_id)
