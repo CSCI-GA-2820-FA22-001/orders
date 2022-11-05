@@ -9,13 +9,19 @@ from flask import Flask
 from flask_migrate import Migrate
 from sqlalchemy import ForeignKey
 from service import app
-
+from enum import Enum
 logger = logging.getLogger("flask.app")
 
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 migrate = Migrate(app, db)
 
+class Status(int, Enum):
+	"""Order Status"""
+	CREATED = 1
+	COMPLETED = 2
+	CANCELLED = 3
+	OTHER = 4
 
 class DataValidationError(Exception):
 	""" Used for an data validation errors when deserializing """
@@ -34,8 +40,8 @@ class Order(db.Model):
 	# Table Schema
 	id = db.Column(db.Integer, primary_key=True)
 	user_id = db.Column(db.Integer, nullable=False)
-	create_time = db.Column(db.String(63), nullable=False)
-	status = db.Column(db.Integer, nullable=False, default=0)
+	create_time = db.Column(db.Integer, nullable=False)
+	status = db.Column(db.Enum(Status), nullable=False, default=Status.CREATED)
 
 	def __repr__(self):
 		return f"<User {self.user_id} Create Time={self.create_time} Status={self.status}>"
@@ -64,7 +70,7 @@ class Order(db.Model):
 
 	def serialize(self):
 		""" Serializes a YourResourceModel into a dictionary """
-		return {"id": self.id, "user_id": self.user_id, "create_time": self.create_time, "status": self.status}
+		return {"id": self.id, "user_id": self.user_id, "create_time": self.create_time, "status": int(self.status)}
 
 	def deserialize(self, data):
 		"""
@@ -82,7 +88,7 @@ class Order(db.Model):
 					+ str(type(data["user_id"]))
 				)
 
-			if isinstance(data["create_time"], str):
+			if isinstance(data["create_time"], int):
 				self.create_time = data["create_time"]
 			else:
 				raise DataValidationError(
@@ -90,7 +96,7 @@ class Order(db.Model):
 					+ str(type(data["create_time"]))
 				)
 			if isinstance(data["status"], int):
-				self.status = data["status"]
+				self.status = Status(data["status"])
 			else:
 				raise DataValidationError(
 					"Invalid type for int [status]: "
@@ -237,3 +243,11 @@ class Items(db.Model):
 			"""
 			logger.info("Processing order_id of item query for %s ...", order_id)
 			return cls.query.filter(cls.order_id == order_id)
+
+		@classmethod
+		def find_by_item_id(cls, item_id):
+			"""
+			Find all order contains item
+			"""
+			logger.info("Processing order query by item for %s ...", item_id)
+			return cls.query.filter(cls.item_id == item_id)

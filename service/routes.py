@@ -6,7 +6,7 @@ Describe what your service does here
 import logging
 from flask import jsonify, request, url_for, make_response, abort
 from .common import status  # HTTP Status Codes
-from service.models import Order, Items
+from service.models import Order, Items, Status
 # Import Flask application
 from . import app
 
@@ -29,7 +29,7 @@ def index():
 @app.route("/orders", methods=["GET"])
 def list_orders():
 	"""List all orders
-	
+
 	Keyword arguments:
 	user_id -- the unique id representing a user
 	Return: all orders owned by user with user_id
@@ -123,46 +123,6 @@ def update_order(order_id):
 		return make_response("", status.HTTP_404_NOT_FOUND)
 
 
-@app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["PUT"])
-def update_order_item(order_id, item_id):
-	"""Update items in order
-
-	Args:
-		order_id (int): the id of the order
-		item_id (int): the id of the order
-	"""
-	order: Order = Order.find(order_id)
-	if order:
-		items = Items.find_by_order_id(order_id)
-		for item in items:
-			if item.item_id == item_id:
-				item.deserialize(request.get_json())
-				item.update()
-				return make_response("", status.HTTP_200_OK)
-		return make_response("", status.HTTP_204_NO_CONTENT)
-	else:
-		return make_response("", status.HTTP_204_NO_CONTENT)
-
-
-@app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["GET"])
-def get_order_item(order_id, item_id):
-	"""Get items in order
-
-	Args:
-		order_id (int): the id of the order
-		item_id (int): the id of the order
-	"""
-	order = Order.find(order_id)
-	if order:
-		items = Items.find_by_order_id(order_id)
-		for item in items:
-			if item.item_id == item_id:
-				return make_response("item exist in order", status.HTTP_200_OK)
-		return make_response("item not exist in order", status.HTTP_204_NO_CONTENT)
-	else:
-		return make_response("", status.HTTP_204_NO_CONTENT)
-
-
 @app.route("/orders/<int:order_id>", methods=["DELETE"])
 def delete_order(order_id):
 	"""
@@ -174,6 +134,21 @@ def delete_order(order_id):
 	if order:
 		order.delete()
 	return make_response("", status.HTTP_204_NO_CONTENT)
+
+
+@app.route("/orders/<int:order_id>/cancel", methods=["POST"])
+def cancel_order(order_id):
+	"""Cancel an order
+	Args:
+		order_id (int): the id of the order
+	"""
+	order = Order.find(order_id)
+	if order:
+		order.status = Status.CANCELLED
+		order.update()
+		return make_response("", status.HTTP_200_OK)
+	else:
+		return make_response("", status.HTTP_404_NOT_FOUND)
 
 
 @app.route("/orders/<int:order_id>/items", methods=["GET"])
@@ -210,6 +185,47 @@ def add_order_item(order_id):
 		message = "order not found"
 		return make_response(jsonify(message), status.HTTP_404_NOT_FOUND)
 	
+
+
+@app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["GET"])
+def get_order_item(order_id, item_id):
+	"""Get items in order
+
+	Args:
+		order_id (int): the id of the order
+		item_id (int): the id of the order
+	"""
+	order = Order.find(order_id)
+	if order:
+		items = Items.find_by_order_id(order_id)
+		for item in items:
+			if item.item_id == item_id:
+				return make_response("item exist in order", status.HTTP_200_OK)
+		return make_response("item not exist in order", status.HTTP_204_NO_CONTENT)
+	else:
+		return make_response("", status.HTTP_204_NO_CONTENT)
+
+
+@app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["PUT"])
+def update_order_item(order_id, item_id):
+	"""Update items in order
+
+	Args:
+		order_id (int): the id of the order
+		item_id (int): the id of the order
+	"""
+	order: Order = Order.find(order_id)
+	if order:
+		items = Items.find_by_order_id(order_id)
+		for item in items:
+			if item.item_id == item_id:
+				item.deserialize(request.get_json())
+				item.update()
+				return make_response("", status.HTTP_200_OK)
+		return make_response("", status.HTTP_204_NO_CONTENT)
+	else:
+		return make_response("", status.HTTP_204_NO_CONTENT)
+
 
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["DELETE"])
 def delete_order_item(order_id, item_id):
