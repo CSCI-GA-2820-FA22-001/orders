@@ -44,10 +44,10 @@ def list_orders():
 			status.HTTP_401_UNAUTHORIZED,
 			"Unauthorized user for unknown user_id.",
 		)
-	
+
 	orders = Order.find_by_user_id(user_id)
 	return make_response(
-		jsonify([order.serialize() for order in orders]), 
+		jsonify([order.serialize() for order in orders]),
 		status.HTTP_200_OK,
 	)
 
@@ -68,7 +68,7 @@ def create_order():
 	# return a message
 	message = order.serialize()
 	message["items"] = []
-	
+
 	if json_data is not None:
 		if json_data.get("items") is not None and isinstance(json_data["items"], list):
 			for item_id in json_data.get("items"):
@@ -95,7 +95,7 @@ def get_order_by_id(order_id):
 	order = Order.find(order_id)
 	if not order:
 		abort(status.HTTP_404_NOT_FOUND, f"Order with id '{order_id}' was not found.")
-	
+
 	order_data = order.serialize()
 	order_data["items"] = []
 	items = Items.find_by_order_id(order_id)
@@ -184,7 +184,6 @@ def add_order_item(order_id):
 	else:
 		message = "order not found"
 		return make_response(jsonify(message), status.HTTP_404_NOT_FOUND)
-	
 
 
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["GET"])
