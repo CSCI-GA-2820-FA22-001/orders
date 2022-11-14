@@ -227,10 +227,10 @@ class TestItemsModel(unittest.TestCase):
 		found = Items.find_by_order_id(order2.id)
 		for item in found:
 			self.assertEqual(item.order_id, order2.id)
-		found2 = Items.find_by_item_id(1)
-		for item in found2:
+		found1 = Items.find_by_item_id(1)
+		for item in found1:
 			self.assertEqual(item.item_id, 1)
-		found = Items.find_by_item_id(2)
+		found2 = Items.find_by_item_id(2)
 		for item in found2:
 			self.assertEqual(item.item_id, 2)
 	
