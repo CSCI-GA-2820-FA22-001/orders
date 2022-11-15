@@ -15,8 +15,8 @@ install: ## Install dependencies
 
 lint: ## Run the linter
 	$(info Running linting...)
-	flake8 service tests --count --select=E9,F63,F7,F82 --ignore=W191,E231,W503,E101,W0311,C0103,W0621 --show-source --statistics
-	flake8 service tests --count --max-complexity=10 --max-line-length=127 --ignore=W191,E231,W503,E101,W0311,C0103,W0621 --statistics
+	flake8 service tests --count --select=E9,F63,F7,F82 --ignore=W191,E231,W503,E101 --show-source --statistics
+	flake8 service tests --count --max-complexity=10 --max-line-length=127 --ignore=W191,E231,W503,E101 --statistics
 
 test: ## Run the unit tests
 	$(info Running tests...)
