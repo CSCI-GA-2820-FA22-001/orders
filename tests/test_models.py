@@ -1,13 +1,9 @@
 """
 Test cases for YourResourceModel Model
-
 """
-import os
 import logging
 import unittest
 from flask import jsonify
-
-from importlib_metadata import metadata
 from service import app
 from service.models import Order, DataValidationError, db, Items, Status
 from service.config import DATABASE_URI
@@ -16,6 +12,8 @@ from time import time
 ######################################################################
 #  <your resource name>   M O D E L   T E S T   C A S E S
 ######################################################################
+
+
 class TestOrderModel(unittest.TestCase):
 	""" Test Cases for Order Model """
 
@@ -83,7 +81,7 @@ class TestOrderModel(unittest.TestCase):
 		self.assertEqual(found[2].order_id, order.id)
 		self.assertEqual(found[2].item_id, 3)
 
-		bad_order = Order.find(order.id+1)
+		bad_order = Order.find(order.id + 1)
 		self.assertTrue(bad_order is None)
 
 	def test_delete_order(self):
@@ -168,6 +166,7 @@ class TestOrderModel(unittest.TestCase):
 		for order in found:
 			self.assertEqual(order.user_id, 123)
 
+
 class TestItemsModel(unittest.TestCase):
 	""" Test Cases for Items Model """
 
@@ -199,12 +198,12 @@ class TestItemsModel(unittest.TestCase):
 	######################################################################
 	#  T E S T   C A S E S
 	######################################################################
-	
+
 	def test_item_repr(self):
 		"""test item __repr__"""
 		order = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
 		order.create()
-		item = Items(order_id=order.id, item_id= 1)
+		item = Items(order_id=order.id, item_id=1)
 		item.create()
 		self.assertEqual(str(item), f"<Order id=[{item.order_id}] Item id=[{item.item_id}]>")
 
@@ -215,9 +214,9 @@ class TestItemsModel(unittest.TestCase):
 		order2 = Order(user_id=124, create_time=ts, status=Status.CREATED)
 		order1.create()
 		order2.create()
-		item1 = Items(order_id=order1.id, item_id = 1)
-		item2 = Items(order_id=order1.id, item_id = 2)
-		item3 = Items(order_id=order2.id, item_id = 2)
+		item1 = Items(order_id=order1.id, item_id=1)
+		item2 = Items(order_id=order1.id, item_id=2)
+		item3 = Items(order_id=order2.id, item_id=2)
 		item1.create()
 		item2.create()
 		item3.create()
@@ -233,17 +232,17 @@ class TestItemsModel(unittest.TestCase):
 		found2 = Items.find_by_item_id(2)
 		for item in found2:
 			self.assertEqual(item.item_id, 2)
-	
+
 	def test_item_update(self):
 		"""test item update"""
 		order = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
 		order.create()
-		item = Items(order_id=order.id, item_id= 1)
+		item = Items(order_id=order.id, item_id=1)
 		item.create()
 		item.item_id = 10
 		item.update()
 		self.assertEqual(Items.find(item.id).item_id, 10)
-	
+
 	def test_deserialize_item(self):
 		"""test deserialize order"""
 		item = Items()
@@ -268,18 +267,16 @@ class TestItemsModel(unittest.TestCase):
 		updated_item = item.deserialize(init_dict)
 		self.assertEqual(updated_item.order_id, 123)
 		self.assertEqual(updated_item.item_id, 999)
-	
 
 	def test_item_all(self):
 		"""test all item function"""
 		order1 = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
 		order1.create()
-		item1 = Items(order_id=order1.id, item_id= 1)
-		item2 = Items(order_id=order1.id, item_id =2)
-		item3 = Items(order_id=order1.id, item_id =2)
+		item1 = Items(order_id=order1.id, item_id=1)
+		item2 = Items(order_id=order1.id, item_id=2)
+		item3 = Items(order_id=order1.id, item_id=2)
 		item1.create()
 		item2.create()
 		item3.create()
 		found = Items.all()
 		self.assertEqual(len([item for item in found]), 3)
-
