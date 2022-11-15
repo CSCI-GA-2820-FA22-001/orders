@@ -2,21 +2,17 @@
 TestYourResourceModel API Service Test Suite
 
 Test cases can be run with the following:
-  nosetests -v --with-spec --spec-color
-  coverage report -m
+nosetests -v --with-spec --spec-color
+coverage report -m
 """
-from distutils.log import info
 import os
 import logging
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
-from venv import create
 
 from flask import jsonify
 from service import app
-from service.models import db, Order, Items, DataValidationError, Status
+from service.models import db, Order, Items, Status
 from service.common import status  # HTTP Status Codes
-from .factories import create_random_time_str
 from time import time
 
 DATABASE_URI = os.getenv(
@@ -26,6 +22,8 @@ BASE_URL = "/orders"
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+
+
 class TestYourResourceServer(TestCase):
 	""" REST API Server Tests """
 
@@ -54,12 +52,11 @@ class TestYourResourceServer(TestCase):
 		""" This runs after each test """
 		db.session.remove()
 
-
 	######################################################################
 	#  H E L P E R S   F U N C T I O N S   H E R E
 	######################################################################
 
-	def _create_order(self, count, user_id_begin = 0, user_id_incr = 0):
+	def _create_order(self, count, user_id_begin=0, user_id_incr=0):
 		"""Factory method to create orders in bulk
 		param:
 			count -> int: represent how many orders you want to generate
@@ -68,7 +65,7 @@ class TestYourResourceServer(TestCase):
 		orders = []
 		user_id = user_id_begin
 		for _ in range(count):
-			order = Order(user_id=user_id, create_time= (int)(time()), status=Status.CREATED)
+			order = Order(user_id=user_id, create_time=(int)(time()), status=Status.CREATED)
 			orders.append(order)
 			user_id += user_id_incr
 		return orders
@@ -81,7 +78,7 @@ class TestYourResourceServer(TestCase):
 		""" It should call the home page """
 		resp = self.client.get("/")
 		self.assertEqual(resp.status_code, status.HTTP_200_OK)
-	
+
 	def test_update_order(self):
 		""" test update /orders/<int:order_id>"""
 		order = self._create_order(count=1, user_id_incr=1)[0]
@@ -112,13 +109,13 @@ class TestYourResourceServer(TestCase):
 		altered_order = self._create_order(count=1, user_id_incr=0)[0]
 		org_order.create()
 		altered_order.create()
-		
+
 		item1 = Items(order_id=org_order.id, item_id=1)
 		item1.create()
 
 		# upadte item
 		updated_item1 = Items(order_id=altered_order.id, item_id=1)
-		
+
 		response = self.client.put(f"{BASE_URL}/10000000/items/{item1.item_id}", json=updated_item1.serialize())
 		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 		response = self.client.put(f"{BASE_URL}/{org_order.id}/items/1000000", json=updated_item1.serialize())
@@ -144,7 +141,7 @@ class TestYourResourceServer(TestCase):
 		altered_order = orders[1]
 		org_order.create()
 		altered_order.create()
-		
+
 		item1 = Items(order_id=org_order.id, item_id=1)
 		item1.create()
 
@@ -166,18 +163,18 @@ class TestYourResourceServer(TestCase):
 		db_order = Order.find(order.id)
 		self.assertEqual(db_order, None)
 		# Todo: get this item and check if it's none
-	
+
 	def test_delete_item(self):
 		""" test delete item by order id and item id"""
 		order1 = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
 		order1.create()
-		item1 = Items(order_id=order1.id, item_id= 1)
-		item2 = Items(order_id=order1.id, item_id =2)
+		item1 = Items(order_id=order1.id, item_id=1)
+		item2 = Items(order_id=order1.id, item_id=2)
 		item1.create()
 		item2.create()
 		response = self.client.delete(f"{BASE_URL}/{order1.id}/items/{item1.id}")
 		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-		
+
 		found = Items.find_by_order_id(order_id=order1.id)
 		count = len([item for item in found])
 		self.assertEqual(count, 1)
@@ -190,43 +187,42 @@ class TestYourResourceServer(TestCase):
 
 	def test_get_order(self):
 		""" It should Get the Order with the order_id"""
-		info = {
+		info_item = {
 			"user_id": 0,
 			"create_time": (int)(time()),
 			"status": Status.CREATED,
 			"items": [1,2,3]
 		}
 
-		response = self.client.post(BASE_URL, json=info)
+		response = self.client.post(BASE_URL, json=info_item)
 		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 		test_id = response.get_json().get("id")
 		response = self.client.get(f"{BASE_URL}/{test_id}")
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
 		new_order = response.get_json()
-		self.assertEqual(new_order["user_id"], info["user_id"])
-		self.assertEqual(new_order["create_time"], info["create_time"])
-		self.assertEqual(new_order["status"], info["status"])
-		self.assertEqual(new_order.get("items"), info["items"])
+		self.assertEqual(new_order["user_id"], info_item["user_id"])
+		self.assertEqual(new_order["create_time"], info_item["create_time"])
+		self.assertEqual(new_order["status"], info_item["status"])
+		self.assertEqual(new_order.get("items"), info_item["items"])
 
 		response = self.client.get(f"{BASE_URL}/10000")
 		self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-
 	def test_create_order(self):
 		""" It should Create a new Order"""
-		info = {
+		info_item = {
 			"user_id": 0,
 			"create_time": (int)(time()),
 			"status": Status.CREATED,
 			"items": [1,2,3]
 		}
 		test_order = Order()
-		test_order = test_order.deserialize(info)
+		test_order = test_order.deserialize(info_item)
 		test_order.create()
 
 		logging.debug("Test Order: %s", test_order.serialize())
-		response = self.client.post(BASE_URL, json=info)
+		response = self.client.post(BASE_URL, json=info_item)
 		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 		# Check the data is correct
@@ -237,7 +233,7 @@ class TestYourResourceServer(TestCase):
 
 		# Test for loop Items create
 
-		for item_id in jsonify(info).get_json().get("items"):
+		for item_id in jsonify(info_item).get_json().get("items"):
 			items = Items()
 			items.order_id = test_order.id
 			items.item_id = item_id
@@ -248,12 +244,12 @@ class TestYourResourceServer(TestCase):
 		self.assertEqual(count, 3)
 		self.assertEqual(found[2].order_id, test_order.id)
 		self.assertEqual(found[2].item_id, 3)
-	
+
 	def test_add_order_item(self):
 		""" It should add an item to the order"""
 		order1 = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
 		order1.create()
-		item1 = Items(order_id=order1.id, item_id= 1)
+		item1 = Items(order_id=order1.id, item_id=1)
 		item1.create()
 
 		response = self.client.post(f"{BASE_URL}/{order1.id}/items", json=item1.serialize())
@@ -268,7 +264,6 @@ class TestYourResourceServer(TestCase):
 		response = self.client.post(f"{BASE_URL}/{404}/items", json=item1.serialize())
 		self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 		self.assertTrue("order not found" == response.get_json())
-
 
 	def test_list_orders(self):
 		""" It should list existing orders """
@@ -291,9 +286,8 @@ class TestYourResourceServer(TestCase):
 		self.assertIsNotNone(data)
 		self.assertEqual(len(data), 2)
 
-
 	def test_list_order_items(self):
-		""" It should list the items in an order"""            
+		""" It should list the items in an order"""
 		order = self._create_order(count=1, user_id_begin=0, user_id_incr=0)
 		for o in order:
 			o.create()
@@ -308,12 +302,11 @@ class TestYourResourceServer(TestCase):
 		self.assertIsNotNone(data)
 		self.assertEqual(len(data), 2)
 
-
 	def test_cancel_order(self):
 		""" It should cancel an order """
 		order = self._create_order(count=1, user_id_begin=0, user_id_incr=0)[0]
 		order.create()
-		
+
 		resp = self.client.get(f"{BASE_URL}/{order.id}")
 		self.assertEqual(resp.status_code, status.HTTP_200_OK)
 		body = resp.get_json()
@@ -333,9 +326,3 @@ class TestYourResourceServer(TestCase):
 		self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 		body = resp.get_json()
 		self.assertIsNone(body)
-
-
-
-	
-	# def test_gg(self):
-	# 	order = Order(user_id=123, create_time=(int)(time()), status=1)
