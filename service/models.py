@@ -141,6 +141,16 @@ class Order(db.Model):
 		logger.info("Processing name query for %s ...", user_id)
 		return cls.query.filter(cls.user_id == user_id)
 
+	@classmethod
+	def find_by_create_time(cls, create_time):
+		"""Returns all YourResourceModels with the given name
+
+		Args:
+			name (string): the name of the YourResourceModels you want to match
+		"""
+		logger.info("Processing lookup for orders with create time %s ...", create_time)
+		return cls.query.filter(cls.create_time == create_time)
+
 
 class Items(db.Model):
 	"""

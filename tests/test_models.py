@@ -166,6 +166,22 @@ class TestOrderModel(unittest.TestCase):
 		for order in found:
 			self.assertEqual(order.user_id, 123)
 
+	def test_find_by_create_time(self):
+		"""test find by user id"""
+		order1_time = 100
+		order1 = Order(user_id=1, create_time=order1_time, status=1)
+		order2_time = 200
+		order2 = Order(user_id=2, create_time=order2_time, status=1)
+		order3_time = 300
+		order3 = Order(user_id=3, create_time=order3_time, status=1)
+		order1.create()
+		order2.create()
+		order3.create()
+		found = Order.find_by_create_time(order1_time)
+		self.assertEqual(found.count(), 1)
+		for order in found:
+			self.assertEqual(order.user_id, 1)
+
 
 class TestItemsModel(unittest.TestCase):
 	""" Test Cases for Items Model """
