@@ -182,6 +182,26 @@ class TestOrderModel(unittest.TestCase):
 		for order in found:
 			self.assertEqual(order.user_id, 1)
 
+	def test_find_by_status(self):
+		"""test find by status"""
+		ts = int(time())
+		order1 = Order(user_id=1, create_time=ts, status=1)
+		order2 = Order(user_id=1, create_time=ts, status=2)
+		order3 = Order(user_id=1, create_time=ts, status=3)
+		order4 = Order(user_id=1, create_time=ts, status=1)
+		order1.create()
+		order2.create()
+		order3.create()
+		order4.create()
+		found1 = Order.find_by_status(1, 1)
+		self.assertEqual(found1.count(), 2)
+		found2 = Order.find_by_status(1, 2)
+		self.assertEqual(found2.count(), 1)
+		found3 = Order.find_by_status(1, 3)
+		self.assertEqual(found3.count(), 1)
+		found4 = Order.find_by_status(2, 3)
+		self.assertEqual(found4.count(), 0)
+
 
 class TestItemsModel(unittest.TestCase):
 	""" Test Cases for Items Model """

@@ -22,7 +22,6 @@ class Status(int, Enum):
 	CREATED = 1
 	COMPLETED = 2
 	CANCELLED = 3
-	OTHER = 4
 
 
 class DataValidationError(Exception):
@@ -150,6 +149,12 @@ class Order(db.Model):
 		"""
 		logger.info("Processing lookup for orders with create time %s ...", create_time)
 		return cls.query.filter(cls.create_time == create_time)
+
+	@classmethod
+	def find_by_status(cls, user_id, status):
+		"""Find all orders with the given status"""
+		logger.info("Processing find all orders with the given status: %s", status)
+		return cls.query.filter(cls.user_id == user_id, cls.status == Status(status))
 
 
 class Items(db.Model):
