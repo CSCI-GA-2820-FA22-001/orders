@@ -236,6 +236,19 @@ def delete_order_item(order_id, item_id):
 				item.delete()
 	return make_response("", status.HTTP_204_NO_CONTENT)
 
+
+@app.route("/orders/user/<int:id>/status/<int:st>", methods=["GET"])
+def get_order_by_status(id, st):
+	if st not in [int(Status.CREATED), int(Status.COMPLETED), int(Status.CANCELLED)]:
+		return make_response(jsonify(f"Invalid Status {st}"), status.HTTP_400_BAD_REQUEST)
+	orders = Order.find_by_status(id, st)
+	if orders.count():
+		order_list = [order.serialize() for order in orders]
+		return make_response(jsonify(order_list), status.HTTP_200_OK)
+	else:
+		return make_response("", status.HTTP_204_NO_CONTENT)
+
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
