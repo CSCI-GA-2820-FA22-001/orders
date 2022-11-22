@@ -353,7 +353,7 @@ class TestYourResourceServer(TestCase):
 		self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 		resp = self.client.get(f"{BASE_URL}/user/2/status/2")
 		self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-	
+
 	def test_get_order_by_item(self):
 		""" test getting order by item"""
 		orders = self._create_order(count=3, user_id_incr=1)
@@ -386,4 +386,3 @@ class TestYourResourceServer(TestCase):
 		self.assertEqual(res_order1.item_id, 1)
 		self.assertEqual(res_order2.item_id, 1)
 		self.assertEqual(res_order3.item_id, 1)
-
