@@ -248,6 +248,15 @@ def get_order_by_status(id, st):
 	else:
 		return make_response("", status.HTTP_204_NO_CONTENT)
 
+@app.route("/orders/items/<int:item_id>", methods=["GET"])
+def get_order_by_item(item_id):
+	orders = Items.find_by_item_id(item_id)
+	if orders.count():
+		order_list = [order.serialize() for order in orders]
+		return make_response(jsonify(order_list), status.HTTP_200_OK)
+	else:
+		return make_response("", status.HTTP_204_NO_CONTENT)
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

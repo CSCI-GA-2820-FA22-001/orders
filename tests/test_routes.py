@@ -353,3 +353,37 @@ class TestYourResourceServer(TestCase):
 		self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 		resp = self.client.get(f"{BASE_URL}/user/2/status/2")
 		self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+	
+	def test_get_order_by_item(self):
+		""" test getting order by item"""
+		orders = self._create_order(count=3, user_id_incr=1)
+		order1 = orders[0]
+		order2 = orders[1]
+		order3 = orders[2]
+		order1.create()
+		order2.create()
+		order3.create()
+
+		item1 = Items(order_id=order1.id, item_id=1)
+		item2 = Items(order_id=order2.id, item_id=1)
+		item3 = Items(order_id=order3.id, item_id=1)
+		item4 = Items(order_id=order1.id, item_id=2)
+		item1.create()
+		item2.create()
+		item3.create()
+		item4.create()
+
+		response = self.client.get(f"{BASE_URL}/items/1")
+		self.assertEqual(response.status_code, status.HTTP_200_OK)
+		body = response.get_json()
+		res_order1 = Items().deserialize(body[0])
+		res_order2 = Items().deserialize(body[1])
+		res_order3 = Items().deserialize(body[2])
+		self.assertEqual(res_order1.order_id, item1.order_id)
+		self.assertEqual(res_order2.order_id, item2.order_id)
+		self.assertEqual(res_order3.order_id, item3.order_id)
+
+		self.assertEqual(res_order1.item_id, 1)
+		self.assertEqual(res_order2.item_id, 1)
+		self.assertEqual(res_order3.item_id, 1)
+
