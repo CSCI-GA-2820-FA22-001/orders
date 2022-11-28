@@ -20,10 +20,7 @@ logger = logging.getLogger("flask.app")
 @app.route("/", methods=["GET"])
 def index():
 	""" Root URL response """
-	return (
-		"Home Page",
-		status.HTTP_200_OK,
-	)
+	return app.send_static_file("index.html")
 
 
 @app.route("/orders", methods=["GET"])
