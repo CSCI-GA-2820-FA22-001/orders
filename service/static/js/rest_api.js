@@ -39,25 +39,23 @@ $(function () {
 
     $("#create-btn").click(function () {
 
-        let name = $("#pet_name").val();
-        let category = $("#pet_category").val();
-        let available = $("#pet_available").val() == "true";
-        let gender = $("#pet_gender").val();
-        let birthday = $("#pet_birthday").val();
+        
+        let user_id = $("#order_userid").val();
+        let create_time = Math.floor(Date.now() / 1000);
+        let items = $("#order_itemlist").val();
+
 
         let data = {
-            "name": name,
-            "category": category,
-            "available": available,
-            "gender": gender,
-            "birthday": birthday
+            "user_id": user_id,
+            "create_time": create_time,
+            "items": items
         };
 
         $("#flash_message").empty();
         
         let ajax = $.ajax({
             type: "POST",
-            url: "/pets",
+            url: "/orders",
             contentType: "application/json",
             data: JSON.stringify(data),
         });
