@@ -40,7 +40,7 @@ $(function () {
     $("#create-btn").click(function () {
 
         
-        let user_id = $("#create-order-id").val();
+        let user_id = parseInt($("#create-order-id").val());
         let create_time = Math.floor(Date.now() / 1000);
         let items = $("#item_list").val();
 
@@ -48,7 +48,8 @@ $(function () {
         let data = {
             "user_id": user_id,
             "create_time": create_time,
-            "items": items
+            "items": items,
+            "status": 1
         };
 
         $("#flash_message").empty();
