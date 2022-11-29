@@ -42,9 +42,17 @@ $(function () {
         
         let user_id = parseInt($("#create-order-id").val());
         let create_time = Math.floor(Date.now() / 1000);
-        let items = $("#item_list").val();
 
-
+        let items = []
+        for(var i = 1; i <= 3; i++){
+            // console.log($(`#item_box_${i}`));
+            // console.log($("#item-box-1").is(':checked'));
+            if($(`#item-box-${i}`).is(':checked')){
+                items.push(i);
+            }
+        }
+        console.log(`User id: ${user_id}`);
+        console.log(`Item list: ${items}`);
         let data = {
             "user_id": user_id,
             "create_time": create_time,
@@ -91,17 +99,5 @@ $(function () {
         $("#to-create-btn").hide();
         $("#retrieve-page").hide();
     })
-    $("#create-btn").click(function(){
-        let user_id = $("#create-order-id").val();
-        let item_list = []
-        for(var i = 1; i <= 3; i++){
-            // console.log($(`#item_box_${i}`));
-            // console.log($("#item-box-1").is(':checked'));
-            if($(`#item-box-${i}`).is(':checked')){
-                item_list.push(i);
-            }
-        }
-        console.log(`User id: ${user_id}`);
-        console.log(`Item list: ${item_list}`);
-    })
+
 })
