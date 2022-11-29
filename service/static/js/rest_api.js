@@ -38,9 +38,8 @@ $(function () {
     // ****************************************
 
     $("#create-btn").click(function () {
-
         
-        let user_id = parseInt($("#create-order-id").val());
+        let user_id = parseInt($("#create-user-id").val());
         let create_time = Math.floor(Date.now() / 1000);
 
         let items = []
@@ -79,25 +78,214 @@ $(function () {
         });
     });
 
+    // ****************************************
+    // Read an order by order id
+    // ****************************************
+
+    $("#read-btn").click(function () {
+        let order_id = parseInt($("#read-order-id").val());
+        console.log(`Order id: ${order_id}`);
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "GET",
+            url: "/orders/" + order_id,
+        });
+
+        ajax.done(function(res){
+            update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
+    // Read an order by item id
+    // ****************************************
+
+    $("#read-by-item-id-btn").click(function () {
+        let item_id = parseInt($("#read-item-id").val());
+        console.log(`item id: ${item_id}`);
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "GET",
+            url: "/orders/items/" + item_id,
+        });
+
+        ajax.done(function(res){
+            update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
+    // Read an order by order status
+    // ****************************************
+
+    $("#read-by-order-status-btn").click(function () {
+        let order_status = parseInt($("#read-order-status").val());
+        let user_id = parseInt($("#read-user-id").val());
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "GET",
+            url: "/orders/user/" + user_id + "/status/" + order_status
+        });
+
+        ajax.done(function(res){
+            update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
+    // Update an order by order id
+    // ****************************************
+
+    $("#update-btn").click(function () {
+        let order_id = parseInt($("#update-order-id").val());
+        let user_id = parseInt($("#update-user-id").val());
+        let create_time = Math.floor(Date.now() / 1000);
+        let order_status = $("#update-order-status").val();
+        console.log(`Order id: ${user_id}`);
+
+        $("#flash_message").empty();
+        
+        let data = {
+            "user_id": user_id,
+            "create_time": create_time,
+            "status": order_status
+        };
+
+        let ajax = $.ajax({
+            type: "PUT",
+            url: "/orders/" + order_id,
+            contentType: "application/json",
+            data: JSON.stringify(data),
+        });
+
+        ajax.done(function(res){
+            update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
+    // Delete an order by order id
+    // ****************************************
+
+    $("#delete-btn").click(function () {
+        let order_id = parseInt($("#delete-order-id").val());
+        console.log(`Order id: ${user_id}`);
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "DELETE",
+            url: "/orders/" + order_id,
+        });
+
+        ajax.done(function(res){
+            update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
 
     // ****************************************
     // Order team code starts here
     // ****************************************
     
     // ****************************************
-    // switch to retrieve page
+    // switch to read page
     // ****************************************
-    $("#to-retrieve-btn").click(function(){
+    function hideAllPages() {
         $("#create-page").hide();
-        $("#to-retrieve-btn").hide();
-        $("#to-create-btn").show();
-        $("#retrieve-page").show();
-    });
-    $("#to-create-btn").click(function(){
+        $("#read-page").hide();
+        $("#read-by-item-id-page").hide();
+        $("#read-by-order-status-page").hide();
+        $("#update-page").hide();
+        $("#delete-page").hide();
+    }
+
+    function resetAllBtns() {
+        document.querySelector('#to-create-page-btn').disabled = false;
+        document.querySelector('#to-read-page-btn').disabled = false;
+        document.querySelector('#to-read-by-item-id-page-btn').disabled = false;
+        document.querySelector('#to-read-by-order-status-page-btn').disabled = false;
+        document.querySelector('#to-update-page-btn').disabled = false;
+        document.querySelector('#to-delete-page-btn').disabled = false;
+    }
+
+    function resetAll() {
+        hideAllPages();
+        resetAllBtns();
+    }
+    
+    $("#to-create-page-btn").click(function(){
+        resetAll();
+
+        // disable the button
+        document.querySelector('#to-create-page-btn').disabled = true;
+        // show the page
         $("#create-page").show();
-        $("#to-retrieve-btn").show();
-        $("#to-create-btn").hide();
-        $("#retrieve-page").hide();
     })
 
+    $("#to-read-page-btn").click(function(){
+        resetAll();
+        // disable the button
+        document.querySelector('#to-read-page-btn').disabled = true;
+        // show the page
+        $("#read-page").show();
+    });
+
+    $("#to-update-page-btn").click(function(){
+        resetAll();
+        // disable the button
+        document.querySelector('#to-update-page-btn').disabled = true;
+        // show the page
+        $("#update-page").show();
+    });
+
+    $("#to-delete-page-btn").click(function(){
+        resetAll();
+        // disable the button
+        document.querySelector('#to-delete-page-btn').disabled = true;
+        // show the page
+        $("#delete-page").show();
+    });
+
+    $("#to-read-by-item-id-page-btn").click(function(){
+        resetAll();
+        // disable the button
+        document.querySelector('#to-read-by-item-id-page-btn').disabled = true;
+        // show the page
+        $("#read-by-item-id-page").show();
+    });
+
+    $("#to-read-by-order-status-page-btn").click(function(){
+        resetAll();
+        // disable the button
+        document.querySelector('#to-read-by-order-status-page-btn').disabled = true;
+        // show the page
+        $("#read-by-order-status-page").show();
+    });
 })

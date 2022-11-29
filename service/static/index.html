@@ -22,23 +22,38 @@
 
       <!-- FORM -->
       <div class="col-md-12" id="form_data">
-        <h3>Create, Retrieve, Update, and Delete a Order:</h3>
+        <h3>Create, Read, Update, and Delete an Order:</h3>
         <div class="well">
           <div class="form-horizontal">
-            <div class="form-group">
+            <div class="row">
               <div class="col-sm-4">
-                <button class="btn btn-primary" id="to-retrieve-btn">To Retrive Page</button>
-                <button class="btn btn-primary" id="to-create-btn" style="display:none;">To Create Page</button>
+                <button class="btn btn-primary" id="to-create-page-btn">To Create Order</button>
+              </div>
+              <div class="col-sm-4">
+                <button class="btn btn-primary" id="to-read-page-btn">To Query Order by Order Id</button>
+              </div>
+              <div class="col-sm-4">
+                <button class="btn btn-primary" id="to-read-by-item-id-page-btn">To Query Order by Item Id</button>
+              </div>
+              <div class="col-sm-4">
+                <button class="btn btn-primary" id="to-read-by-order-status-page-btn">To Query Order by Order Status</button>
+              </div>
+              <div class="col-sm-4">
+                <button class="btn btn-primary" id="to-update-page-btn">To Update Order</button>
+              </div>
+              <div class="col-sm-4">
+                <button class="btn btn-primary" id="to-delete-page-btn">To Delete Order</button>
               </div>
             </div>
           </div> <!-- form horizontal -->
+
           <!-- Create page -->
           <div class="form-horizontal" id="create-page">
             <!-- NAME -->
             <div class="form-group">
               <label class="control-label col-sm-2" for="user-id">User ID:</label>
               <div class="col-sm-10">
-                <input type="" class="form-control" id="create-order-id" placeholder="Enter ID for User">
+                <input type="" class="form-control" id="create-user-id" placeholder="Enter ID for User">
               </div>
             </div>
 
@@ -76,15 +91,99 @@
               </div>
             </div>
           </div> <!-- form horizontal -->
-          <!--- Retrieve page-->
-          <div class="form-horizontal" id="retrieve-page", style="display:none;">
-            <h1>
-              TODO
-            </h1>
+
+          <!--- Read by order id page-->
+          <div class="form-horizontal" id="read-page", style="display:none;">
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="Order-id">Order ID:</label>
+              <div class="col-sm-10">
+                <input type="" class="form-control" id="read-order-id" placeholder="Enter ID for Order">
+              </div>
+            </div>
             <!-- SUBMIT BUTTONS -->
             <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-primary" id="search-btn">Search</button>
+                <button type="submit" class="btn btn-primary" id="read-btn">Read</button>
+                <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <!--- Read by item id page-->
+          <div class="form-horizontal" id="read-by-item-id-page", style="display:none;">
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="Item-id">Item ID:</label>
+              <div class="col-sm-10">
+                <input type="" class="form-control" id="read-item-id" placeholder="Enter ID for Item">
+              </div>
+            </div>
+            <!-- SUBMIT BUTTONS -->
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary" id="read-by-item-id-btn">Read</button>
+                <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <!--- Read by order status page-->
+          <div class="form-horizontal" id="read-by-order-status-page", style="display:none;">
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="user-id">User ID:</label>
+              <div class="col-sm-10">
+                <input type="" class="form-control" id="read-user-id" placeholder="Enter ID for User">
+              </div>
+              <label class="control-label col-sm-2" for="Order-status">Order Status:</label>
+              <div class="col-sm-10">
+                <input type="" class="form-control" id="read-order-status" placeholder="Enter Status for Order">
+              </div>
+            </div>
+            <!-- SUBMIT BUTTONS -->
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary" id="read-by-order-status-btn">Read</button>
+                <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <!--- Update page-->
+          <div class="form-horizontal" id="update-page", style="display:none;">
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="Order-id">Order ID:</label>
+              <div class="col-sm-10">
+                <input type="" class="form-control" id="update-order-id" placeholder="Enter ID for Order">
+              </div>
+              <label class="control-label col-sm-2" for="Order-id">User ID:</label>
+              <div class="col-sm-10">
+                <input type="" class="form-control" id="update-user-id" placeholder="Enter ID for User">
+              </div>
+              <label class="control-label col-sm-2" for="Order-id">Order Status:</label>
+              <div class="col-sm-10">
+                <input type="" class="form-control" id="update-order-status" placeholder="Enter Status for Order">
+              </div>
+            </div>
+            <!-- SUBMIT BUTTONS -->
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary" id="update-btn">Update</button>
+                <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <!--- Delete page-->
+          <div class="form-horizontal" id="delete-page", style="display:none;">
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="Order-id">Order ID:</label>
+              <div class="col-sm-10">
+                <input type="" class="form-control" id="delete-order-id" placeholder="Enter ID for Order">
+              </div>
+            </div>
+            <!-- SUBMIT BUTTONS -->
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary" id="delete-btn">Delete</button>
                 <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
               </div>
             </div>
@@ -133,7 +232,7 @@
   </body>
   <script type="module">
     $(document).ready(function(){
-      $("#to-retrieve-btn").show();
+      $("#to-read-btn").show();
       $("#create-page").show();
     })
   </script>
