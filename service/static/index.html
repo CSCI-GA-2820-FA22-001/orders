@@ -92,6 +92,123 @@
         </div> <!-- end well -->
       </div> <!-- end Form -->
 
+
+      <div class="col-md-12" id="form_data_order">
+        <h3>Create, Retrieve, Update, and Delete an Order:</h3>
+        <div class="well">
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="order_id">Order ID:</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" id="order_id" placeholder="Enter ID of Order">
+              </div>
+              <div class="col-sm-4">
+                <button type="submit" class="btn btn-primary" id="retrieve-order-btn">Retrieve</button>
+                <button type="submit" class="btn btn-danger" id="delete-order-btn">Delete</button>
+                <button type="submit" class="btn btn-danger" id="cancel-order-btn">Cancel</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-horizontal">
+            <!-- USER ID -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="user_id">User ID:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="user_id" placeholder="Enter User ID">
+              </div>
+            </div>
+
+            <!-- CREATE TIME -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="create_time">Create Time:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="create_time" placeholder="Enter Create Time">
+              </div>
+            </div>
+
+            <!-- ITEMS -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="items">Items:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="items" placeholder="Enter Items (Multiple Items Separated with ',')">
+              </div>
+            </div>
+
+            <!-- STATUS -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="status">Status:</label>
+              <div class="col-sm-10">
+                <select name="cars" id="status">
+                  <option value="created">Created</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- SUBMIT BUTTONS -->
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary" id="list-order-btn">List Orders</button>
+                <button type="submit" class="btn btn-primary" id="search-order-btn">Search Order</button>
+                <button type="submit" class="btn btn-primary" id="clear-order-btn">Clear</button>
+                <button type="submit" class="btn btn-success" id="create-order-btn">Create Order</button>
+                <button type="submit" class="btn btn-warning" id="update-order-btn">Update Order</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12" id="form_data_item">
+        <h3>Create, Retrieve, Update, and Delete an Item:</h3>
+        <div class="well">
+          <div class="form-horizontal">
+
+            <!-- Order ID -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="order_id_for_item">Order ID:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="order_id_for_item" placeholder="Enter Order ID">
+              </div>
+            </div>
+
+            <!-- Item ID -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="item_id">Item ID:</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" id="item_id" placeholder="Enter ID of Item">
+              </div>
+              <div class="col-sm-4">
+                <button type="submit" class="btn btn-primary" id="retrieve-item-btn">Retrieve</button>
+                <button type="submit" class="btn btn-danger" id="delete-item-btn">Delete</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-horizontal">
+            <!-- Item Details -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="item_detail">Item details:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="item_detail" placeholder="Enter Json Body for the Item">
+              </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary" id="get-item-btn">List Items</button>
+                <button type="submit" class="btn btn-primary" id="clear-item-btn">Clear</button>
+                <button type="submit" class="btn btn-success" id="create-item-btn">Add Item</button>
+                <button type="submit" class="btn btn-warning" id="update-item-btn">Update Item</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Search Results -->
       <div class="table-responsive col-md-12" id="search_results">
         <table class="table table-striped">
