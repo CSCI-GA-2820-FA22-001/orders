@@ -5,26 +5,48 @@ $(function () {
     // ****************************************
 
     // Updates the form with data from the response
-    function update_form_data(res) {
-        $("#pet_id").val(res.id);
-        $("#pet_name").val(res.name);
-        $("#pet_category").val(res.category);
-        if (res.available == true) {
-            $("#pet_available").val("true");
-        } else {
-            $("#pet_available").val("false");
+    function status2int(status) {
+        if (status == "created")  {
+            return 1;
         }
-        $("#pet_gender").val(res.gender);
-        $("#pet_birthday").val(res.birthday);
+        if (status == "completed") {
+            return 2;
+        }
+        if (status == "cancelled") {
+            return 3;
+        }
+        return 0;
+    }
+
+    function int2status(status) {
+        if (status == 1) {
+            return "created";
+        }
+        if (status == 2) {
+            return "completed";
+        }
+        if (status == 3) {
+            return "cancelled";
+        }
+        return "unknown";
+    }
+    
+    function update_form_data_order(res) {
+        console.log(`res:` + res)
+        $("#order_id").val(res.id)
+        $("#user_id").val(res.user_id);
+        $("#create_time").val(res.create_time);
+        $("#items").val(res.items);
+        $("#status").val(int2status(res.status));
     }
 
     /// Clears all form fields
-    function clear_form_data() {
-        $("#pet_name").val("");
-        $("#pet_category").val("");
-        $("#pet_available").val("");
-        $("#pet_gender").val("");
-        $("#pet_birthday").val("");
+    function clear_form_data_order() {
+        $("#order_id").val("");
+        $("#user_id").val("");
+        $("#create_time").val("");
+        $("#items").val("");
+        $("#status").val("");
     }
 
     // Updates the flash message area
@@ -59,7 +81,7 @@ $(function () {
             "items": items,
             "status": 1
         };
-
+        console.log(`data:` + JSON.stringify(data));
         $("#flash_message").empty();
         
         let ajax = $.ajax({
@@ -70,7 +92,7 @@ $(function () {
         });
 
         ajax.done(function(res){
-            update_form_data(res)
+            update_form_data_order(res)
             flash_message("Success")
         });
 
@@ -83,6 +105,136 @@ $(function () {
     // ****************************************
     // Order team code starts here
     // ****************************************
+    
+    // ****************************************
+    // Create a Order
+    // ****************************************
+
+    $("#create-order-btn").click(function () {
+        let user_id = parseInt($("#user_id").val());
+        let create_time = Math.floor(Date.now() / 1000);
+        let items = [];
+        if ($("#items").val().length > 0) {
+            items = $("#items").val().split(",");
+        }
+
+        let data = {
+            "user_id": user_id,
+            "create_time": create_time,
+            "items": items,
+            "status": 1
+        };
+        console.log(`data:` + JSON.stringify(data));
+
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "POST",
+            url: "/orders",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+        });
+
+        ajax.done(function(res){
+            update_form_data_order(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
+    // Read an order by order id
+    // ****************************************
+
+    $("#retrieve-order-btn").click(function () {
+        let order_id = parseInt($("#order_id").val());
+        console.log(`Order ID: ${order_id}`);
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "GET",
+            url: "/orders/" + order_id,
+        });
+
+        ajax.done(function(res){
+            update_form_data_order(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
+    // Update an order by order id
+    // ****************************************
+
+    $("#update-order-btn").click(function () {
+        let order_id = parseInt($("#order_id").val());
+        let user_id = parseInt($("#user_id").val());
+        let status = status2int($("#status").val());
+        let create_time = Math.floor(Date.now() / 1000);
+        let items = [];
+        if ($("#items").val().length > 0) {
+            items = $("#items").val().split(",");
+        }
+
+        $("#flash_message").empty();
+        
+        let data = {
+            "user_id": user_id,
+            "create_time": create_time,
+            "status": status,
+            "items": items
+        };
+        console.log(`status:` + $("#status").val());
+        console.log(`data:` + JSON.stringify(data));
+
+        let ajax = $.ajax({
+            type: "PUT",
+            url: "/orders/" + order_id,
+            contentType: "application/json",
+            data: JSON.stringify(data),
+        });
+
+        ajax.done(function(res){
+            update_form_data_order(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
+    // Delete an order by order id
+    // ****************************************
+
+    $("#delete-order-btn").click(function () {
+        let order_id = parseInt($("#order_id").val());
+        console.log(`Order ID: ${order_id}`);
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "DELETE",
+            url: "/orders/" + order_id,
+        });
+
+        ajax.done(function(res){
+            clear_form_data_order()
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
     
     // ****************************************
     // switch to retrieve page
