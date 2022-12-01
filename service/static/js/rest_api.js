@@ -234,22 +234,4 @@ $(function () {
             flash_message(res.responseJSON.message)
         });
     });
-
-    
-    // ****************************************
-    // switch to retrieve page
-    // ****************************************
-    $("#to-retrieve-btn").click(function(){
-        $("#create-page").hide();
-        $("#to-retrieve-btn").hide();
-        $("#to-create-btn").show();
-        $("#retrieve-page").show();
-    });
-    $("#to-create-btn").click(function(){
-        $("#create-page").show();
-        $("#to-retrieve-btn").show();
-        $("#to-create-btn").hide();
-        $("#retrieve-page").hide();
-    })
-
 })
