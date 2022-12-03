@@ -15,10 +15,12 @@ logger = logging.getLogger("flask.app")
 ############################################################
 # Health Endpoint
 ############################################################
+
+
 @app.route("/health")
 def health():
-    """Health Status"""
-    return jsonify(dict(status="OK")), status.HTTP_200_OK
+	"""Health Status"""
+	return jsonify(dict(status="OK")), status.HTTP_200_OK
 
 
 ######################################################################
