@@ -12,6 +12,17 @@ from . import app
 
 logger = logging.getLogger("flask.app")
 
+############################################################
+# Health Endpoint
+############################################################
+
+
+@app.route("/health")
+def health():
+	"""Health Status"""
+	return jsonify(dict(status="OK")), status.HTTP_200_OK
+
+
 ######################################################################
 # GET INDEX
 ######################################################################
@@ -20,10 +31,7 @@ logger = logging.getLogger("flask.app")
 @app.route("/", methods=["GET"])
 def index():
 	""" Root URL response """
-	return (
-		"Home Page",
-		status.HTTP_200_OK,
-	)
+	return app.send_static_file("index.html")
 
 
 @app.route("/orders", methods=["GET"])
@@ -242,6 +250,16 @@ def get_order_by_status(id, st):
 	if st not in [int(Status.CREATED), int(Status.COMPLETED), int(Status.CANCELLED)]:
 		return make_response(jsonify(f"Invalid Status {st}"), status.HTTP_400_BAD_REQUEST)
 	orders = Order.find_by_status(id, st)
+	if orders.count():
+		order_list = [order.serialize() for order in orders]
+		return make_response(jsonify(order_list), status.HTTP_200_OK)
+	else:
+		return make_response("", status.HTTP_204_NO_CONTENT)
+
+
+@app.route("/orders/items/<int:item_id>", methods=["GET"])
+def get_order_by_item(item_id):
+	orders = Items.find_by_item_id(item_id)
 	if orders.count():
 		order_list = [order.serialize() for order in orders]
 		return make_response(jsonify(order_list), status.HTTP_200_OK)
