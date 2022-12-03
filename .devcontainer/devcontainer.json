@@ -23,7 +23,16 @@
 		"redhat.vscode-yaml",
 		"streetsidesoftware.code-spell-checker",
 		"wholroyd.jinja",
-		"bbenoist.vagrant"
+		"bbenoist.vagrant",
+		"ms-azuretools.vscode-docker",
 	],
-	"postCreateCommand": "sudo pip install -r requirements.txt"
+	"postCreateCommand": "sudo pip install -r requirements.txt",
+	"features": {
+		"docker-in-docker": "latest",
+		"kubectl-helm-minikube": {
+			"version": "latest",
+			"helm": "latest",
+			"minikube": "none"
+		}
+	}	
 }
