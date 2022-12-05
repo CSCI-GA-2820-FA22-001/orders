@@ -34,6 +34,7 @@ class TestOrderModel(unittest.TestCase):
 	def setUp(self):
 		""" This runs before each test """
 		db.session.query(Order).delete()  # clean up the last tests
+		db.session.query(Items).delete()
 		db.session.commit()
 
 	def tearDown(self):
