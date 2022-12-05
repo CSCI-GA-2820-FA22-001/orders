@@ -10,7 +10,7 @@ import logging
 from unittest import TestCase
 
 from flask import jsonify
-from service import app
+from service import app, error_handlers
 from service.models import db, Order, Items, Status
 from service.common import status  # HTTP Status Codes
 from time import time
@@ -152,6 +152,9 @@ class TestYourResourceServer(TestCase):
 		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 		response = self.client.get(f"{BASE_URL}/100000/items/{item1.item_id}", json=item1.serialize())
+		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+		response = self.client.get(f"{BASE_URL}/20/items/{item1.item_id}", json=item1.serialize())
 		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 	def test_delete_order(self):
@@ -386,3 +389,72 @@ class TestYourResourceServer(TestCase):
 		self.assertEqual(res_order1.item_id, 1)
 		self.assertEqual(res_order2.item_id, 1)
 		self.assertEqual(res_order3.item_id, 1)
+
+	def test_route_health(self):
+		"""test route health"""
+		response = self.client.get("/health")
+		body = response.get_json()
+		self.assertEqual(response.status_code, status.HTTP_200_OK)
+		self.assertEqual(body["status"], "OK")
+
+	def test_request_validation_error(self):
+		"""test_request_validation_error"""
+		err_msg = "sample err message"
+		result = error_handlers.request_validation_error(err_msg)
+		self.assertEqual(str(result), str(error_handlers.bad_request(err_msg)))
+
+	def test_method_not_supported(self):
+		"""test_method_not_supported"""
+		err_msg = "method: get_order"
+		result = error_handlers.method_not_supported(err_msg)
+		t = (
+			jsonify(
+				status=status.HTTP_405_METHOD_NOT_ALLOWED,
+				error="Method not Allowed",
+				message=err_msg,
+			),
+			status.HTTP_405_METHOD_NOT_ALLOWED,
+		)
+		self.assertEqual(str(result), str(t))
+
+	def test_resource_conflict(self):
+		"""test_resource_conflict"""
+		err_msg = "resource conflict"
+		result = error_handlers.resource_conflict(err_msg)
+		t = (
+			jsonify(
+				status=status.HTTP_409_CONFLICT,
+				error="Conflict",
+				message=err_msg,
+			),
+			status.HTTP_409_CONFLICT,
+		)
+		self.assertEqual(str(result), str(t))
+
+	def test_mediatype_not_supported(self):
+		"""test_mediatype_not_supported"""
+		err_msg = "media type not supported"
+		result = error_handlers.mediatype_not_supported(err_msg)
+		t = (
+			jsonify(
+				status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+				error="Unsupported media type",
+				message=err_msg,
+			),
+			status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+		)
+		self.assertEqual(str(result), str(t))
+
+	def test_internal_server_error(self):
+		"""test_internal_server_error"""
+		err_msg = "internal server error"
+		result = error_handlers.internal_server_error(err_msg)
+		t = (
+			jsonify(
+				status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+				error="Internal Server Error",
+				message=err_msg,
+			),
+			status.HTTP_500_INTERNAL_SERVER_ERROR,
+		)
+		self.assertEqual(str(result), str(t))
