@@ -46,6 +46,7 @@ class TestYourResourceServer(TestCase):
 		""" This runs before each test """
 		self.client = app.test_client()
 		db.session.query(Order).delete()  # clean up the last tests
+		db.session.query(Items).delete()
 		db.session.commit()
 
 	def tearDown(self):
