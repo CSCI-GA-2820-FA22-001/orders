@@ -55,52 +55,6 @@ $(function () {
         $("#flash_message").append(message);
     }
 
-    // ****************************************
-    // Create a Order
-    // ****************************************
-
-    $("#create-btn").click(function () {
-
-        
-        let user_id = parseInt($("#create-order-id").val());
-        let create_time = Math.floor(Date.now() / 1000);
-
-        let items = []
-        for(var i = 1; i <= 3; i++){
-            // console.log($(`#item_box_${i}`));
-            // console.log($("#item-box-1").is(':checked'));
-            if($(`#item-box-${i}`).is(':checked')){
-                items.push(i);
-            }
-        }
-        console.log(`User id: ${user_id}`);
-        console.log(`Item list: ${items}`);
-        let data = {
-            "user_id": user_id,
-            "create_time": create_time,
-            "items": items,
-            "status": 1
-        };
-        console.log(`data:` + JSON.stringify(data));
-        $("#flash_message").empty();
-        
-        let ajax = $.ajax({
-            type: "POST",
-            url: "/orders",
-            contentType: "application/json",
-            data: JSON.stringify(data),
-        });
-
-        ajax.done(function(res){
-            update_form_data_order(res)
-            flash_message("Success")
-        });
-
-        ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
-        });
-    });
-
 
     // ****************************************
     // Order team code starts here
@@ -234,4 +188,36 @@ $(function () {
             flash_message(res.responseJSON.message)
         });
     });
+
+    // ****************************************
+    // Add an item to order
+    // ****************************************
+
+    $("#add-item-btn").click(function () {
+        let order_id = parseInt($("#order_id").val());
+        let item_id = parseInt($("#item_id").val());
+        console.log(`Order ID: ${order_id} ; Item ID: ${item_id} `);
+        $("#flash_message").empty();
+        
+        let data = {
+            "order_id": order_id,
+            "item_id": item_id
+        };
+        console.log(`data:` + JSON.stringify(data));
+
+        let ajax = $.ajax({
+            type: "POST",
+            url: "/orders/" + order_id + "/items"
+        });
+
+        ajax.done(function(res){
+            clear_form_data_order()
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
 })
+
