@@ -60,7 +60,7 @@ def list_orders():
 			st != Status.COMPLETED.value and \
 			st != Status.CANCELLED.value:
 			return make_response(jsonify(f"Invalid Status {st}"), status.HTTP_400_BAD_REQUEST)
-		
+
 		orders = Order.find_by_status(user_id, st)
 		if orders.count():
 			order_list = [order.serialize() for order in orders]

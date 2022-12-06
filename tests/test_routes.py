@@ -381,7 +381,7 @@ class TestYourResourceServer(TestCase):
 
 		response = self.client.get(BASE_URL, query_string="item_id=1")
 		self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-		
+
 		response = self.client.get(BASE_URL, query_string="user_id=2&item_id=3")
 		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
