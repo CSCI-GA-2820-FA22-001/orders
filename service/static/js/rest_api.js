@@ -285,7 +285,7 @@ $(function () {
         
         let ajax = $.ajax({
             type: "GET",
-            url: "/orders/" + user_id + "/" + status,
+            url: "/orders/" + user_id + "/" + order_status,
         });
 
         ajax.done(function(res){
