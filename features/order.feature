@@ -7,9 +7,9 @@ Background:
     Given the following orders
         | user_id | create_time | status | items |
         | 1       | 1670369200  | 1      | 1,2   |
-        | 1       | 1670369200  | 1      | 3,4   |
-        | 1       | 1670369200  | 1      | 5     |
-        | 1       | 1670369200  | 1      | 6     |
+        | 1       | 1670369201  | 1      | 3,4   |
+        | 1       | 1670369202  | 1      | 5     |
+        | 1       | 1670369203  | 1      | 6     |
 
 Scenario: The server is running
     When I visit the "Home Page"
@@ -20,3 +20,8 @@ Scenario: List orders of a user
     And I set the "user_id" to "1"
     And I press "list-order-btn" button
     Then I should see "Success" in the "flash_message"
+    And I should see "1" in the result
+    And I should see "1670369200" in the result
+    And I should see "1670369201" in the result
+    And I should see "1670369202" in the result
+    And I should see "1670369203" in the result
