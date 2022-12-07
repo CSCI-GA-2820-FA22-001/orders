@@ -15,3 +15,19 @@ def step_impl(context):
 def step_impl(context, message):
 	""" Check the document title for a message """
 	expect(context.driver.title).to_contain(message)
+
+
+@when('I press "{button_id}" button')
+def step_impl(context, button_id):
+	context.driver.find_element_by_id(button_id).click()
+
+@when('I set the "{element_id}" to "{text_string}"')
+def step_impl(context, element_id, text_string):
+	element = context.driver.find_element_by_id(element_id)
+	element.clear()
+	element.send_keys(text_string)
+
+@then('I should see "{text}" in the "{element_id}"')
+def step_impl(context, text, element_id):
+	element = context.driver.find_element_by_id(element_id)
+	expect(element.text).to_equal(text)

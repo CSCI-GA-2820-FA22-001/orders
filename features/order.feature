@@ -14,3 +14,9 @@ Background:
 Scenario: The server is running
     When I visit the "Home Page"
     Then I should see "Order Demo RESTful Service" in the title
+
+Scenario: List orders of a user
+    When I visit the "Home Page"
+    And I set the "user_id" to "1"
+    And I press "list-order-btn" button
+    Then I should see "Success" in the "flash_message"
