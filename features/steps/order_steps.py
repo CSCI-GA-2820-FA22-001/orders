@@ -22,7 +22,7 @@ def step_impl(context):
 			"user_id": int(row["user_id"]),
 			"create_time": int(row["create_time"]),
 			"status": int(row["status"]),
-			"items": [1]
+			"items": [int(x) for x in row["items"].split(",")]
 		}
 		context.resp = requests.post(f"{context.BASE_URL}/orders", json=payload)
 		expect(context.resp.status_code).to_equal(201)

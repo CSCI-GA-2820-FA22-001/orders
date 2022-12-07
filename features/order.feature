@@ -5,11 +5,11 @@ Feature: The pet store service back-end
 
 Background:
     Given the following orders
-        | user_id | create_time | status |
-        | 1       | 1670369200  | 1      |
-        | 1       | 1670369200  | 1      |
-        | 1       | 1670369200  | 1      |
-        | 1       | 1670369200  | 1      |
+        | user_id | create_time | status | items |
+        | 1       | 1670369200  | 1      | 1,2   |
+        | 1       | 1670369200  | 1      | 3,4   |
+        | 1       | 1670369200  | 1      | 5     |
+        | 1       | 1670369200  | 1      | 6     |
 
 Scenario: The server is running
     When I visit the "Home Page"
