@@ -49,6 +49,40 @@ $(function () {
         $("#status").val("");
     }
 
+    // Updates rows in order table
+    function update_order_table(orders) {
+        $("#search_results").empty();
+        let table = `<table class="table table-striped">`
+        table += `<thead>`
+        table += `<tr>`
+        table += `<th class="col-md-1">Order ID</th>`
+        table += `<th class="col-md-4">User ID</th>`
+        table += `<th class="col-md-4">Create Time</th>`
+        table += `<th class="col-md-3">Status</th>`
+        table += `</tr>`
+        table += `</thead>`
+        table += `<tbody>`
+
+        let firstOrder = ""
+        for (let i = 0; i < orders.length; i++) {
+            let order = orders[i];
+            table += `<tr id="row=${i}"> <td>${order.id}</td>` 
+            table += `<td>${order.user_id}</td>`
+            table += `<td> ${order.create_time} </td>`
+            table += `<td> ${order.status} </td>`
+            table += `</tr>`
+            if (i == 0) {
+                firstOrder = order;
+            }
+        }
+        table += '</tbody></table>'
+        $("#search_results").append(table);
+
+        if (firstOrder != "") {
+            update_form_data_order(firstOrder)
+        }
+    }
+
     // Updates the flash message area
     function flash_message(message) {
         $("#flash_message").empty();
@@ -106,6 +140,33 @@ $(function () {
     // Order team code starts here
     // ****************************************
     
+    // ****************************************
+    // Listing Orders
+    // ****************************************
+
+    $("#list-order-btn").click(function () {
+        let user_id = parseInt($("#user_id").val());
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "GET",
+            url: "/orders?user_id=" + user_id,
+            contentType: "application/json",
+            // data: JSON.stringify(data),
+        });
+
+        ajax.done(function(res){
+            console.log(res)
+            update_order_table(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    })
+
     // ****************************************
     // Create a Order
     // ****************************************
