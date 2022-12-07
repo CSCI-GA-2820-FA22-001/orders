@@ -59,4 +59,3 @@ jobs:
           behave
         env:
           DATABASE_URI: "postgresql://postgres:pgs3cr3t@postgres:5432/testdb"
-  
