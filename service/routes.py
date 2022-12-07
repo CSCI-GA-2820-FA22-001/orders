@@ -39,12 +39,13 @@ def list_orders():
 	"""List all orders
 
 	Keyword arguments:
-	user_id -- the unique id representing a user
-	Return: all orders owned by user with user_id
+	user_id -- the unique id representing a user (required)
+	status -- the status to filter the orders (optional)
+	item_id -- item id to filter the orders (optional)
+	Return: all related orders owned by user with user_id
 	"""
 
 	app.logger.info("Request listing orders")
-	# TODO: how is parameter user_id passed?
 	args = request.args
 	user_id = args.get("user_id", type=int)
 	if user_id is None:
@@ -52,6 +53,32 @@ def list_orders():
 			status.HTTP_401_UNAUTHORIZED,
 			"Unauthorized user for unknown user_id.",
 		)
+
+	st = args.get("status", type=int)
+	if st is not None:
+		if st != Status.CREATED.value and \
+			st != Status.COMPLETED.value and \
+			st != Status.CANCELLED.value:
+			return make_response(jsonify(f"Invalid Status {st}"), status.HTTP_400_BAD_REQUEST)
+
+		orders = Order.find_by_status(user_id, st)
+		if orders.count():
+			order_list = [order.serialize() for order in orders]
+			return make_response(jsonify(order_list), status.HTTP_200_OK)
+		else:
+			return make_response("", status.HTTP_204_NO_CONTENT)
+
+	item_id = args.get("item_id", type=int)
+	if item_id is not None:
+		items = Items.find_by_item_id(item_id)
+		if items.count():
+			orders = []
+			for item in items:
+				order = Order.find(by_id=item.order_id)
+				orders.append(order.serialize())
+			return make_response(jsonify(orders), status.HTTP_200_OK)
+		else:
+			return make_response("", status.HTTP_204_NO_CONTENT)
 
 	orders = Order.find_by_user_id(user_id)
 	return make_response(
@@ -92,9 +119,19 @@ def create_order():
 	)
 
 
+@app.route("/orders/all", methods=["GET"])
+def get_all_order():
+	app.logger.info("List all order in the database")
+	orders = Order.all()
+	return make_response(
+		jsonify([order.serialize() for order in orders]),
+		status.HTTP_200_OK,
+	)
+
+
 @app.route("/orders/<int:order_id>", methods=["GET"])
 def get_order_by_id(order_id):
-	"""Delete order by order id
+	"""Get order by order id
 
 	Args:
 		order_id (int): the id of the order
@@ -243,28 +280,6 @@ def delete_order_item(order_id, item_id):
 			if item.id == item_id:
 				item.delete()
 	return make_response("", status.HTTP_204_NO_CONTENT)
-
-
-@app.route("/orders/user/<int:id>/status/<int:st>", methods=["GET"])
-def get_order_by_status(id, st):
-	if st not in [int(Status.CREATED), int(Status.COMPLETED), int(Status.CANCELLED)]:
-		return make_response(jsonify(f"Invalid Status {st}"), status.HTTP_400_BAD_REQUEST)
-	orders = Order.find_by_status(id, st)
-	if orders.count():
-		order_list = [order.serialize() for order in orders]
-		return make_response(jsonify(order_list), status.HTTP_200_OK)
-	else:
-		return make_response("", status.HTTP_204_NO_CONTENT)
-
-
-@app.route("/orders/items/<int:item_id>", methods=["GET"])
-def get_order_by_item(item_id):
-	orders = Items.find_by_item_id(item_id)
-	if orders.count():
-		order_list = [order.serialize() for order in orders]
-		return make_response(jsonify(order_list), status.HTTP_200_OK)
-	else:
-		return make_response("", status.HTTP_204_NO_CONTENT)
 
 
 ######################################################################

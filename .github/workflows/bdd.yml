@@ -2,6 +2,7 @@ name: BDD Tests
 on:
   push:
     branches:
+      - dev
       - master
     paths-ignore:
     - 'README.md'
@@ -48,16 +49,13 @@ jobs:
           python -m pip install --upgrade pip wheel
           pip install -r requirements.txt
 
-      - name: Run the service locally
+      - name: Run the service locally and run behave test
         run: |
           echo "\n*** STARTING APPLICATION ***\n"
           gunicorn --log-level=critical --bind=0.0.0.0:8080 service:app &
           sleep 5
           curl -i http://localhost:8080/health
           echo "\n*** SERVER IS RUNNING ***"
+          behave
         env:
           DATABASE_URI: "postgresql://postgres:pgs3cr3t@postgres:5432/testdb"
-
-      - name: Run Integration Tests
-        run: behave
-  

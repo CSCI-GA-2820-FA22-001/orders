@@ -342,7 +342,7 @@ class TestYourResourceServer(TestCase):
 		order2.create()
 		order3.create()
 		order4.create()
-		resp = self.client.get(f"{BASE_URL}/user/1/status/1")
+		resp = self.client.get(BASE_URL, query_string="user_id=1&status=1")
 		self.assertEqual(resp.status_code, status.HTTP_200_OK)
 		body = resp.get_json()
 		res_order1 = Order().deserialize(body[0])
@@ -353,14 +353,16 @@ class TestYourResourceServer(TestCase):
 		self.assertEqual(res_order2.create_time, order4.create_time)
 		self.assertEqual(res_order1.status, order1.status)
 		self.assertEqual(res_order2.status, order4.status)
-		resp = self.client.get(f"{BASE_URL}/user/1/status/4")
+		resp = self.client.get(BASE_URL, query_string="status=4")
+		self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
+		resp = self.client.get(BASE_URL, query_string="user_id=1&status=4")
 		self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-		resp = self.client.get(f"{BASE_URL}/user/2/status/2")
+		resp = self.client.get(BASE_URL, query_string="user_id=2&status=2")
 		self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
-	def test_get_order_by_item(self):
+	def test_get_order_by_item_id(self):
 		""" test getting order by item"""
-		orders = self._create_order(count=3, user_id_incr=1)
+		orders = self._create_order(count=3, user_id_begin=2, user_id_incr=0)
 		order1 = orders[0]
 		order2 = orders[1]
 		order3 = orders[2]
@@ -377,19 +379,19 @@ class TestYourResourceServer(TestCase):
 		item3.create()
 		item4.create()
 
-		response = self.client.get(f"{BASE_URL}/items/1")
+		response = self.client.get(BASE_URL, query_string="item_id=1")
+		self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+		response = self.client.get(BASE_URL, query_string="user_id=2&item_id=3")
+		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+		response = self.client.get(BASE_URL, query_string="user_id=2&=item_id=1")
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
 		body = response.get_json()
-		res_order1 = Items().deserialize(body[0])
-		res_order2 = Items().deserialize(body[1])
-		res_order3 = Items().deserialize(body[2])
-		self.assertEqual(res_order1.order_id, item1.order_id)
-		self.assertEqual(res_order2.order_id, item2.order_id)
-		self.assertEqual(res_order3.order_id, item3.order_id)
-
-		self.assertEqual(res_order1.item_id, 1)
-		self.assertEqual(res_order2.item_id, 1)
-		self.assertEqual(res_order3.item_id, 1)
+		self.assertEqual(len(body), 3)
+		self.assertEqual(body[0]["id"], item1.order_id)
+		self.assertEqual(body[1]["id"], item2.order_id)
+		self.assertEqual(body[2]["id"], item3.order_id)
 
 	def test_route_health(self):
 		"""test route health"""
@@ -459,3 +461,16 @@ class TestYourResourceServer(TestCase):
 			status.HTTP_500_INTERNAL_SERVER_ERROR,
 		)
 		self.assertEqual(str(result), str(t))
+
+	def test_get_all_order(self):
+		"""test_get_all_order"""
+		order1 = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
+		order1.create()
+		order1 = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
+		order1.create()
+		order1 = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
+		order1.create()
+		result = self.client.get("/orders/all")
+		body = result.get_json()
+		self.assertEqual(result.status_code, status.HTTP_200_OK)
+		self.assertEqual(len(body), 3)
