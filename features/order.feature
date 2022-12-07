@@ -50,3 +50,4 @@ Scenario: Delete an order
     And I should see "1670369201" in the result
     And I should see "1670369202" in the result
     And I should see "1670369203" in the result
+    And I should not see "1670369200" in the results

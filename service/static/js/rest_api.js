@@ -476,6 +476,10 @@ $(function () {
         clear_form_data_order()
     });
 
+    $("#clear-item-btn").click(function () {
+        clear_form_data_item()
+    });
+
     // ****************************************
     // Delete an item in and order by order id and item id
     // ****************************************

@@ -1,5 +1,5 @@
 from behave import when, then
-from compare import expect
+from compare import expect, ensure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions
@@ -75,3 +75,10 @@ def step_impl(context, element_id):
 	)
 	element.clear()
 	element.send_keys(context.clipboard)
+
+
+@then('I should not see "{name}" in the results')
+def step_impl(context, name):
+	element = context.driver.find_element_by_id('search_results')
+	error_msg = "I should not see '%s' in '%s'" % (name, element.text)
+	ensure(name in element.text, False, error_msg)
