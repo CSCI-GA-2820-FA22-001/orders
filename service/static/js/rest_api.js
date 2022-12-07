@@ -228,7 +228,7 @@ $(function () {
     })
 
     // ****************************************
-    // Create a Order
+    // Read an order by status and user id
     // ****************************************
 
     $("#search-order-by-status-btn").click(function () {
@@ -265,6 +265,7 @@ $(function () {
         });
 
         ajax.done(function(res){
+            update_item_table(res)
             flash_message("Success")
         });
 
