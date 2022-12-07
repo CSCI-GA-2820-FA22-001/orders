@@ -119,6 +119,16 @@ def create_order():
 	)
 
 
+@app.route("/orders/all", methods=["GET"])
+def get_all_order():
+	app.logger.info("List all order in the database")
+	orders = Order.all()
+	return make_response(
+		jsonify([order.serialize() for order in orders]),
+		status.HTTP_200_OK,
+	)
+
+
 @app.route("/orders/<int:order_id>", methods=["GET"])
 def get_order_by_id(order_id):
 	"""Get order by order id
