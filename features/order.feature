@@ -25,3 +25,28 @@ Scenario: List orders of a user
     And I should see "1670369201" in the result
     And I should see "1670369202" in the result
     And I should see "1670369203" in the result
+
+Scenario: Create an order
+    When I visit the "home page"
+    And I set the "user_id" to "2"
+    And I set the "items" to "1"
+    And I select "Created" in the "status" dropdown
+    And I press "create-order-btn" button
+    Then I should see "Success" in the "flash_message"
+    When I set the "user_id" to "2"
+    And I press "list-order-btn" button
+    Then I should see "2" in the result
+
+Scenario: Delete an order
+    When I visit the "home page"
+    And I set the "user_id" to "1"
+    And I press "list-order-btn" button
+    And I press "delete-order-btn" button
+    Then I should see "Success" in the "flash_message"
+    When I set the "user_id" to "1"
+    And I press "list-order-btn" button
+    Then I should see "Success" in the "flash_message"
+    And I should see "1" in the result
+    And I should see "1670369201" in the result
+    And I should see "1670369202" in the result
+    And I should see "1670369203" in the result

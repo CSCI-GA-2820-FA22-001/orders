@@ -1,7 +1,7 @@
 from behave import when, then
 from compare import expect
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions
 
 
@@ -44,3 +44,34 @@ def step_impl(context, user_id):
 		)
 	)
 	expect(found).to_be(True)
+
+
+@when('I select "{text}" in the "{element_id}" dropdown')
+def step_impl(context, text, element_id):
+	element = Select(context.driver.find_element_by_id(element_id))
+	element.select_by_visible_text(text)
+
+
+@then('the "{element_id}" field should be empty')
+def step_impl(context, element_id):
+	element = context.driver.find_element_by_id(element_id)
+	expect(element.get_attribute('value')).to_be(u'')
+
+##################################################################
+# These two function simulate copy and paste
+##################################################################
+@when('I copy the "{element_id}" field')
+def step_impl(context, element_id):
+	element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+		expected_conditions.presence_of_element_located((By.ID, element_id))
+	)
+	context.clipboard = element.get_attribute('value')
+	logging.info('Clipboard contains: %s', context.clipboard)
+
+@when('I paste the "{element_id}" field')
+def step_impl(context, element_id):
+	element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+		expected_conditions.presence_of_element_located((By.ID, element_id))
+	)
+	element.clear()
+	element.send_keys(context.clipboard)

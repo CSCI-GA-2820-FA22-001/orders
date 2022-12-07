@@ -52,7 +52,7 @@ $(function () {
         $("#user_id").val("");
         $("#create_time").val("");
         $("#items").val("");
-        $("#status").val("");
+        // $("#status").val("Created");
     }
 
     /// Clears all item form fields
@@ -167,8 +167,8 @@ $(function () {
         });
 
         ajax.done(function(res){
-            update_form_data_order(res)
-            flash_message("Success")
+            update_form_data_order(res);
+            flash_message("Success");
         });
 
         ajax.fail(function(res){
@@ -470,6 +470,10 @@ $(function () {
         ajax.fail(function(res){
             flash_message(res.responseJSON.message)
         });
+    });
+
+    $("#clear-order-btn").click(function () {
+        clear_form_data_order()
     });
 
     // ****************************************
