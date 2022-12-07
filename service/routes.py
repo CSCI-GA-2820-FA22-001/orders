@@ -121,7 +121,7 @@ def create_order():
 
 @app.route("/orders/<int:order_id>", methods=["GET"])
 def get_order_by_id(order_id):
-	"""Delete order by order id
+	"""Get order by order id
 
 	Args:
 		order_id (int): the id of the order

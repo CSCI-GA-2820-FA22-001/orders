@@ -40,13 +40,26 @@ $(function () {
         $("#status").val(int2status(res.status));
     }
 
-    /// Clears all form fields
+    function update_form_data_item(res) {
+        console.log(`res:` + res)
+        $("#order_id_for_item").val(res.order_id);
+        $("#item_id").val(res.item_id);
+    }
+
+    /// Clears all order form fields
     function clear_form_data_order() {
         $("#order_id").val("");
         $("#user_id").val("");
         $("#create_time").val("");
         $("#items").val("");
         $("#status").val("");
+    }
+
+    /// Clears all item form fields
+    function clear_form_data_item() {            
+        $("#order_id_for_item").val("");
+        $("#item_id").val("");
+        $("#item_detail").val("");
     }
 
     // Updates rows in order table
@@ -107,6 +120,10 @@ $(function () {
         }
         table += '</tbody></table>'
         $("#search_results_item").append(table);
+
+        if (firstItem != "") {
+            update_form_data_item(firstItem)
+        }
     }
 
     // Updates the flash message area
@@ -115,84 +132,11 @@ $(function () {
         $("#flash_message").append(message);
     }
 
-    // ****************************************
-    // Create a Order
-    // ****************************************
-
-    $("#create-btn").click(function () {
-
-        
-        let user_id = parseInt($("#create-order-id").val());
-        let create_time = Math.floor(Date.now() / 1000);
-
-        let items = []
-        for(var i = 1; i <= 3; i++){
-            // console.log($(`#item_box_${i}`));
-            // console.log($("#item-box-1").is(':checked'));
-            if($(`#item-box-${i}`).is(':checked')){
-                items.push(i);
-            }
-        }
-        console.log(`User id: ${user_id}`);
-        console.log(`Item list: ${items}`);
-        let data = {
-            "user_id": user_id,
-            "create_time": create_time,
-            "items": items,
-            "status": 1
-        };
-        console.log(`data:` + JSON.stringify(data));
-        $("#flash_message").empty();
-        
-        let ajax = $.ajax({
-            type: "POST",
-            url: "/orders",
-            contentType: "application/json",
-            data: JSON.stringify(data),
-        });
-
-        ajax.done(function(res){
-            update_form_data_order(res)
-            flash_message("Success")
-        });
-
-        ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
-        });
-    });
-
 
     // ****************************************
     // Order team code starts here
     // ****************************************
     
-    // ****************************************
-    // Listing Orders
-    // ****************************************
-
-    $("#list-order-btn").click(function () {
-        let user_id = parseInt($("#user_id").val());
-
-        $("#flash_message").empty();
-
-        let ajax = $.ajax({
-            type: "GET",
-            url: "/orders?user_id=" + user_id,
-            contentType: "application/json",
-            // data: JSON.stringify(data),
-        });
-
-        ajax.done(function(res){
-            console.log(res)
-            update_order_table(res)
-            flash_message("Success")
-        });
-
-        ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
-        });
-    })
-
     // ****************************************
     // Create a Order
     // ****************************************
@@ -257,6 +201,125 @@ $(function () {
     });
 
     // ****************************************
+    // Listing Orders
+    // ****************************************
+
+    $("#list-order-btn").click(function () {
+        let user_id = parseInt($("#user_id").val());
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "GET",
+            url: "/orders?user_id=" + user_id,
+            contentType: "application/json",
+            // data: JSON.stringify(data),
+        });
+
+        ajax.done(function(res){
+            console.log(res)
+            update_order_table(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    })
+
+    // ****************************************
+    // Create a Order
+    // ****************************************
+
+    $("#search-order-by-status-btn").click(function () {
+        let order_status = parseInt($("#status").val());
+        let user_id = parseInt($("#user_id").val());
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "GET",
+            url: "/orders/" + user_id + "/" + status,
+        });
+
+        ajax.done(function(res){
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
+    // List all items id an order by order id
+    // ****************************************
+
+    $("#get-item-btn").click(function () {
+        let order_id = parseInt($("#order_id_for_item").val());
+
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "GET",
+            url: "/orders/" + order_id + "/items",
+        });
+
+        ajax.done(function(res){
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
+    // Read an order by status and user id
+    // ****************************************
+
+    $("#search-order-by-status-btn").click(function () {
+        let order_status = parseInt($("#status").val());
+        let user_id = parseInt($("#user_id").val());
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "GET",
+            url: "/orders/" + user_id + "/" + status,
+        });
+
+        ajax.done(function(res){
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
+    // List all items id an order by order id
+    // ****************************************
+
+    $("#get-item-btn").click(function () {
+        let order_id = parseInt($("#order_id_for_item").val());
+
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "GET",
+            url: "/orders/" + order_id + "/items",
+        });
+
+        ajax.done(function(res){
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
     // Update an order by order id
     // ****************************************
 
@@ -299,6 +362,59 @@ $(function () {
     });
 
     // ****************************************
+    // Update an item in an order by order id and item id
+    // ****************************************
+
+    $("#update-item-btn").click(function () {
+        let item_id = parseInt($("#item_id").val());
+        let order_id = parseInt($("#order_id_for_item").val());
+        let item_json = $("#item_detail").val()
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "PUT",
+            url: "/orders/" + order_id+ "/items/" + item_id,
+            data: JSON.stringify(item_json),
+        });
+
+        ajax.done(function(res){
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
+    // Cancel an order
+    // ****************************************
+
+    $("#cancel-order-btn").click(function () {
+        let order_id = parseInt($("#order_id").val());
+        let status = status2int($("#status").val());
+        $("#flash_message").empty();
+
+        let status_json = {
+            "status": status
+        }
+
+        let ajax = $.ajax({
+            type: "POST",
+            url: "/orders/" + order_id+ "/cancel",
+            data: JSON.stringify(status_json),
+        });
+
+        ajax.done(function(res){
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
     // Delete an order by order id
     // ****************************************
 
@@ -321,4 +437,63 @@ $(function () {
             flash_message(res.responseJSON.message)
         });
     });
+
+    // ****************************************
+    // Add an item to order
+    // ****************************************
+
+    $("#add-item-btn").click(function () {
+        let order_id = parseInt($("#order_id").val());
+        let item_id = parseInt($("#item_id").val());
+        console.log(`Order ID: ${order_id} ; Item ID: ${item_id} `);
+        $("#flash_message").empty();
+        
+        let data = {
+            "order_id": order_id,
+            "item_id": item_id
+        };
+        console.log(`data:` + JSON.stringify(data));
+
+        let ajax = $.ajax({
+            type: "POST",
+            url: "/orders/" + order_id + "/items",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+        });
+
+        ajax.done(function(res){
+            clear_form_data_order()
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
+    // Delete an item in and order by order id and item id
+    // ****************************************
+
+    $("#delete-item-btn").click(function () {
+        let item_id = parseInt($("#item_id").val());
+        let order_id = parseInt($("#order_id_for_item").val());
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "DELETE",
+            url: "/orders/" + order_id+ "/items/" + item_id
+        });
+
+        ajax.done(function(res){
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    
 })
+
