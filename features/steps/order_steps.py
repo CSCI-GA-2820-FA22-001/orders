@@ -2,6 +2,7 @@ import requests
 from behave import given
 from compare import expect
 
+
 @given('the following orders')
 def step_impl(context):
 	""" Delete all Pets and load new ones """
