@@ -37,6 +37,19 @@ Scenario: Create an order
     And I press "list-order-btn" button
     Then I should see "2" in the result
 
+Scenario: Retrive an order
+    When I visit the "home page"
+    And I set the "user_id" to "1"
+    And I press "list-order-btn" button
+    And I copy the "order_id" field
+    And I press "clear-order-btn" button
+    And I paste the "order_id" field
+    And I press "retrieve-order-btn" button
+    Then I should see "1670369200" in the "create_time" input value
+    And I should see "1" in the "user_id" input value
+    And I should see "1,2" in the "items" input value
+    And I should see "created" in the "status" input value
+
 Scenario: Delete an order
     When I visit the "home page"
     And I set the "user_id" to "1"
