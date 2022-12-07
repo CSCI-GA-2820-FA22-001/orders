@@ -83,6 +83,32 @@ $(function () {
         }
     }
 
+    // Updates items in item table
+    function update_item_table(items) {
+        $("#search_results_item").empty();
+        let table = `<table class="table table-striped">`
+        table += `<thead>`
+        table += `<tr>`
+        table += `<th class="col-md-1">Order ID</th>`
+        table += `<th class="col-md-4">Item ID</th>`
+        table += `</tr>`
+        table += `</thead>`
+        table += `<tbody>`
+
+        let firstItem = ""
+        for (let i = 0; i < items.length; i++) {
+            let item = items[i];
+            table += `<tr id="row=${i}"> <td>${item.order_id}</td>` 
+            table += `<td>${item.item_id}</td>`
+            table += `</tr>`
+            if (i == 0) {
+                firstItem = item;
+            }
+        }
+        table += '</tbody></table>'
+        $("#search_results_item").append(table);
+    }
+
     // Updates the flash message area
     function flash_message(message) {
         $("#flash_message").empty();
