@@ -56,9 +56,10 @@ jobs:
           sleep 5
           curl -i http://localhost:8080/health
           echo "\n*** SERVER IS RUNNING ***"
+          behave
         env:
           DATABASE_URI: "postgresql://postgres:pgs3cr3t@postgres:5432/testdb"
 
-      - name: Run Integration Tests
-        run: behave
+      # - name: Run Integration Tests
+      #   run: behave
   
