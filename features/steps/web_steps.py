@@ -1,3 +1,4 @@
+import logging
 from behave import when, then
 from compare import expect, ensure
 from selenium.webdriver.common.by import By
@@ -82,3 +83,9 @@ def step_impl(context, name):
 	element = context.driver.find_element_by_id('search_results')
 	error_msg = "I should not see '%s' in '%s'" % (name, element.text)
 	ensure(name in element.text, False, error_msg)
+
+@then('I should see "{text}" in the "{element_id}" input value')
+def step_impl(context, text, element_id):
+	element = context.driver.find_element_by_id(element_id)
+	error_msg = "I should see '%s' in '%s' not '%s'" % (text, element.text, element.get_attribute("value"))
+	ensure(element.get_attribute("value") == text, True, error_msg)

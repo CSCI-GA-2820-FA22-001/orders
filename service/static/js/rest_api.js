@@ -285,7 +285,7 @@ $(function () {
         
         let ajax = $.ajax({
             type: "GET",
-            url: "/orders/" + user_id + "/" + status,
+            url: "/orders/" + user_id + "/" + order_status,
         });
 
         ajax.done(function(res){
@@ -444,7 +444,7 @@ $(function () {
     // ****************************************
 
     $("#add-item-btn").click(function () {
-        let order_id = parseInt($("#order_id").val());
+        let order_id = parseInt($("#order_id_for_item").val());
         let item_id = parseInt($("#item_id").val());
         console.log(`Order ID: ${order_id} ; Item ID: ${item_id} `);
         $("#flash_message").empty();
