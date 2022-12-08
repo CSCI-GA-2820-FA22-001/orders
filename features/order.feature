@@ -10,6 +10,7 @@ Background:
         | 1       | 1670369201  | 1      | 3,4   |
         | 1       | 1670369202  | 1      | 5     |
         | 1       | 1670369203  | 1      | 6     |
+        | 23      | 1670461870  | 1      | 1     |
 
 Scenario: The server is running
     When I visit the "Home Page"
@@ -79,3 +80,29 @@ Scenario: Delete an order
     And I should see "1670369202" in the result
     And I should see "1670369203" in the result
     And I should not see "1670369200" in the results
+
+Scenario: List item of order
+    When I visit the "home page"
+    And I set the "user_id" to "23"
+    And I press "list-order-btn" button
+    And I copy the "order_id" field
+    And I press "clear-order-btn" button
+    And I paste the "order_id_for_item" field
+    And I press "get-item-btn" button
+    Then I should see "Success" in the "flash_message"
+    And I should see "1" in the result
+
+Scenario: Add item to order
+    When I visit the "home page"
+    And I set the "user_id" to "23"
+    And I press "list-order-btn" button
+    And I copy the "order_id" field
+    And I press "clear-order-btn" button
+    And I paste the "order_id_for_item" field
+    And I set the "item_id" to "2"
+    And I press "add-item-btn" button
+    Then I should see "Success" in the "flash_message"
+    When I press "get-item-btn" button
+    Then I should see "Success" in the "flash_message"
+    And I should see "2" in the result
+
