@@ -461,3 +461,16 @@ class TestYourResourceServer(TestCase):
 			status.HTTP_500_INTERNAL_SERVER_ERROR,
 		)
 		self.assertEqual(str(result), str(t))
+
+	def test_get_all_order(self):
+		"""test_get_all_order"""
+		order1 = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
+		order1.create()
+		order1 = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
+		order1.create()
+		order1 = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
+		order1.create()
+		result = self.client.get("/orders/all")
+		body = result.get_json()
+		self.assertEqual(result.status_code, status.HTTP_200_OK)
+		self.assertEqual(len(body), 3)

@@ -52,14 +52,78 @@ $(function () {
         $("#user_id").val("");
         $("#create_time").val("");
         $("#items").val("");
-        $("#status").val("");
+        // $("#status").val("Created");
     }
 
     /// Clears all item form fields
-    function clear_form_data_item() {
+    function clear_form_data_item() {            
         $("#order_id_for_item").val("");
         $("#item_id").val("");
         $("#item_detail").val("");
+    }
+
+    // Updates rows in order table
+    function update_order_table(orders) {
+        $("#search_results").empty();
+        let table = `<table class="table table-striped">`
+        table += `<thead>`
+        table += `<tr>`
+        table += `<th class="col-md-1">Order ID</th>`
+        table += `<th class="col-md-4">User ID</th>`
+        table += `<th class="col-md-4">Create Time</th>`
+        table += `<th class="col-md-3">Status</th>`
+        table += `</tr>`
+        table += `</thead>`
+        table += `<tbody>`
+
+        let firstOrder = ""
+        for (let i = 0; i < orders.length; i++) {
+            let order = orders[i];
+            table += `<tr id="row=${i}"> <td>${order.id}</td>` 
+            table += `<td>${order.user_id}</td>`
+            table += `<td> ${order.create_time} </td>`
+            table += `<td> ${order.status} </td>`
+            table += `</tr>`
+            if (i == 0) {
+                firstOrder = order;
+            }
+        }
+        table += '</tbody></table>'
+        $("#search_results").append(table);
+
+        if (firstOrder != "") {
+            update_form_data_order(firstOrder)
+        }
+    }
+
+    // Updates items in item table
+    function update_item_table(items) {
+        $("#search_results_item").empty();
+        let table = `<table class="table table-striped">`
+        table += `<thead>`
+        table += `<tr>`
+        table += `<th class="col-md-1">Order ID</th>`
+        table += `<th class="col-md-4">Item ID</th>`
+        table += `</tr>`
+        table += `</thead>`
+        table += `<tbody>`
+
+        let firstItem = ""
+        for (let i = 0; i < items.length; i++) {
+            let item = items[i];
+            table += `<tr id="row=${i}"> <td>${item.order_id}</td>` 
+            table += `<td>${item.item_id}</td>`
+            table += `</tr>`
+            if (i == 0) {
+                firstItem = item;
+            }
+        }
+        table += '</tbody></table>'
+        $("#search_results_item").append(table);
+
+        if (firstItem != "") {
+            update_form_data_item(firstItem)
+        }
     }
 
     // Updates the flash message area
@@ -103,8 +167,8 @@ $(function () {
         });
 
         ajax.done(function(res){
-            update_form_data_order(res)
-            flash_message("Success")
+            update_form_data_order(res);
+            flash_message("Success");
         });
 
         ajax.fail(function(res){
@@ -135,6 +199,33 @@ $(function () {
             flash_message(res.responseJSON.message)
         });
     });
+
+    // ****************************************
+    // Listing Orders
+    // ****************************************
+
+    $("#list-order-btn").click(function () {
+        let user_id = parseInt($("#user_id").val());
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "GET",
+            url: "/orders?user_id=" + user_id,
+            contentType: "application/json",
+            // data: JSON.stringify(data),
+        });
+
+        ajax.done(function(res){
+            console.log(res)
+            update_order_table(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    })
 
     // ****************************************
     // Read an order by status and user id
@@ -174,6 +265,7 @@ $(function () {
         });
 
         ajax.done(function(res){
+            update_item_table(res)
             flash_message("Success")
         });
 
@@ -193,7 +285,7 @@ $(function () {
         
         let ajax = $.ajax({
             type: "GET",
-            url: "/orders/" + user_id + "/" + status,
+            url: "/orders/" + user_id + "/" + order_status,
         });
 
         ajax.done(function(res){
@@ -378,6 +470,14 @@ $(function () {
         ajax.fail(function(res){
             flash_message(res.responseJSON.message)
         });
+    });
+
+    $("#clear-order-btn").click(function () {
+        clear_form_data_order()
+    });
+
+    $("#clear-item-btn").click(function () {
+        clear_form_data_item()
     });
 
     // ****************************************
