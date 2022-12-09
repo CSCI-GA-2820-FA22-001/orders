@@ -4,8 +4,9 @@ My Service
 Describe what your service does here
 """
 import logging
-from flask import jsonify, request, url_for, make_response, abort
-from flask_restx import Api, Resource, fields, reqparse, inputs
+import secrets
+from flask import jsonify, request, make_response, abort
+from flask_restx import Api, Resource, fields, reqparse
 from .common import status  # HTTP Status Codes
 from service.models import Order, Items, Status
 # Import Flask application
@@ -38,14 +39,25 @@ def index():
 ######################################################################
 # Configure Swagger before initializing it
 ######################################################################
-api = Api(app,
-		  version='1.0.0',
-		  title='orders REST API Service',
-		  description='This is a server for orders.',
-		  default='orders',
-		  default_label='orders operations',
-		  doc='/apidocs',  # default also could use doc='/apidocs/'
-		  )
+
+
+api = Api(
+	app,
+	version='1.0.0',
+	title='orders REST API Service',
+	description='This is a server for orders.',
+	default='orders',
+	default_label='orders operations',
+	doc='/apidocs',  # default also could use doc='/apidocs/'
+)
+
+
+######################################################################
+# Function to generate a random API key (good for testing)
+######################################################################
+def generate_apikey():
+	""" Helper function used when testing API keys """
+	return secrets.token_hex(16)
 
 
 create_model = api.model('Order', {
@@ -58,22 +70,28 @@ order_model = api.inherit(
 	'OrderModel',
 	create_model,
 	{
-		'id': fields.Integer(readOnly=True,
-							 description='The unique id assigned internally by service')
+		'id': fields.Integer(
+			readOnly=True,
+			description='The unique id assigned internally by service')
 	}
 )
 
 order_args = reqparse.RequestParser()
-order_args.add_argument('user_id', type=int, location='args',
-						required=False, help='List Orders by user_id')
-order_args.add_argument('status', type=int, location='args',
-						required=False, help='List Orders by status')
-order_args.add_argument('create_time', type=int,
-						location='args', required=False, help='List Orders by create_time')
-order_args.add_argument('item_id', type=int,
-						location='args', required=False, help='List Orders by item_id')
-order_args.add_argument('items', type=list,
-						location='args', required=False, help='Create Order with items')
+order_args.add_argument(
+	'user_id', type=int, location='args',
+	required=False, help='List Orders by user_id')
+order_args.add_argument(
+	'status', type=int, location='args',
+	required=False, help='List Orders by status')
+order_args.add_argument(
+	'create_time', type=int,
+	location='args', required=False, help='List Orders by create_time')
+order_args.add_argument(
+	'item_id', type=int,
+	location='args', required=False, help='List Orders by item_id')
+order_args.add_argument(
+	'items', type=list,
+	location='args', required=False, help='Create Order with items')
 
 
 @api.route("/orders")
@@ -105,8 +123,8 @@ class OrderResource(Resource):
 		st = args["status"]
 		if st is not None:
 			if st != Status.CREATED.value and \
-					st != Status.COMPLETED.value and \
-					st != Status.CANCELLED.value:
+				st != Status.COMPLETED.value and \
+				st != Status.CANCELLED.value:
 				return f"Invalid Status {st}", status.HTTP_400_BAD_REQUEST
 
 			orders = Order.find_by_status(user_id, st)
@@ -286,8 +304,9 @@ class OrderSingleResource(Resource):
 		app.logger.info("Request for pet with id: %s", order_id)
 		order = Order.find(order_id)
 		if not order:
-			abort(status.HTTP_404_NOT_FOUND,
-				  f"Order with id '{order_id}' was not found.")
+			abort(
+				status.HTTP_404_NOT_FOUND,
+				f"Order with id '{order_id}' was not found.")
 
 		order_data = order.serialize()
 		order_data["items"] = []
