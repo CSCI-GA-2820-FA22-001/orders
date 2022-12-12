@@ -161,7 +161,7 @@ class Items(db.Model):
 	"""
 	Class that represents a Item-Order matching Model
 	id: int
-	oder_id:int
+	order_id:int
 	item_id:int
 	"""
 	__tablename__ = "items"
