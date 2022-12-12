@@ -406,6 +406,20 @@ class TestYourResourceServer(TestCase):
 		result = error_handlers.request_validation_error(err_msg)
 		self.assertEqual(str(result), str(error_handlers.bad_request(err_msg)))
 
+	def test_resource_not_found(self):
+		"""test_resource_not_found"""
+		err_msg = "resource not found"
+		result = error_handlers.not_found(err_msg)
+		t = (
+			jsonify(
+				status=status.HTTP_404_NOT_FOUND,
+				error="resource not Found",
+				message=err_msg,
+			),
+			status.HTTP_404_NOT_FOUND,
+		)
+		self.assertEqual(str(result), str(t))
+
 	def test_method_not_supported(self):
 		"""test_method_not_supported"""
 		err_msg = "method: get_order"
