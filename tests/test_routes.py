@@ -220,7 +220,6 @@ class TestYourResourceServer(TestCase):
 		response = self.client.get(f"{BASE_URL}?user_id=1&item_id={item.item_id}")
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-
 	def test_create_order(self):
 		""" It should Create a new Order"""
 		info_item = {
