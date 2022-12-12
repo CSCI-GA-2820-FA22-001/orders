@@ -413,7 +413,7 @@ class TestYourResourceServer(TestCase):
 		t = (
 			jsonify(
 				status=status.HTTP_404_NOT_FOUND,
-				error="resource not Found",
+				error="Not Found",
 				message=err_msg,
 			),
 			status.HTTP_404_NOT_FOUND,
