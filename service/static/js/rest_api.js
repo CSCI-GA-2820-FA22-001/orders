@@ -6,13 +6,13 @@ $(function () {
 
     // Updates the form with data from the response
     function status2int(status) {
-        if (status == "created")  {
+        if (status == "Created")  {
             return 1;
         }
-        if (status == "completed") {
+        if (status == "Completed") {
             return 2;
         }
-        if (status == "cancelled") {
+        if (status == "Cancelled") {
             return 3;
         }
         return 0;
@@ -20,13 +20,13 @@ $(function () {
 
     function int2status(status) {
         if (status == 1) {
-            return "created";
+            return "Created";
         }
         if (status == 2) {
-            return "completed";
+            return "Completed";
         }
         if (status == 3) {
-            return "cancelled";
+            return "Cancelled";
         }
         return "unknown";
     }
@@ -82,7 +82,7 @@ $(function () {
             table += `<tr id="row=${i}"> <td>${order.id}</td>` 
             table += `<td>${order.user_id}</td>`
             table += `<td> ${order.create_time} </td>`
-            table += `<td> ${order.status} </td>`
+            table += `<td> ${int2status(order.status)} </td>`
             table += `</tr>`
             if (i == 0) {
                 firstOrder = order;
@@ -257,7 +257,7 @@ $(function () {
 
     $("#search-order-by-status-btn").click(function () {
         var e = document.getElementById("status");
-        var order_status = parseInt(e.value);
+        var order_status = status2int(e.value);
         let user_id = parseInt($("#user_id").val());
         $("#flash_message").empty();
         
@@ -316,7 +316,7 @@ $(function () {
         let order_id = parseInt($("#order_id").val());
         let user_id = parseInt($("#user_id").val());
         var e = document.getElementById("status");
-        var order_status = parseInt(e.value);
+        var order_status = status2int(e.value);
         let create_time = Math.floor(Date.now() / 1000);
         let items = [];
         if ($("#items").val().length > 0) {
@@ -390,7 +390,7 @@ $(function () {
     $("#cancel-order-btn").click(function () {
         let order_id = parseInt($("#order_id").val());
         var e = document.getElementById("status");
-        var status = parseInt(e.value);
+        var status = status2int(e.value);
         $("#flash_message").empty();
 
         let status_json = {
