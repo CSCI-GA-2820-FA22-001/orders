@@ -228,29 +228,6 @@ $(function () {
     })
 
     // ****************************************
-    // Read an order by status and user id
-    // ****************************************
-
-    $("#search-order-by-status-btn").click(function () {
-        let order_status = parseInt($("#status").val());
-        let user_id = parseInt($("#user_id").val());
-        $("#flash_message").empty();
-        
-        let ajax = $.ajax({
-            type: "GET",
-            url: "/orders/" + user_id + "/" + status,
-        });
-
-        ajax.done(function(res){
-            flash_message("Success")
-        });
-
-        ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
-        });
-    });
-
-    // ****************************************
     // List all items id an order by order id
     // ****************************************
 
@@ -279,14 +256,17 @@ $(function () {
     // ****************************************
 
     $("#search-order-by-status-btn").click(function () {
-        let order_status = parseInt($("#status").val());
+        var e = document.getElementById("status");
+        var order_status = parseInt(e.value);
         let user_id = parseInt($("#user_id").val());
         $("#flash_message").empty();
         
         let ajax = $.ajax({
             type: "GET",
-            url: "/orders/" + user_id + "/" + order_status,
+            url: "/orders/" + "user_id="+user_id + "&status=" + order_status,
         });
+
+        console.log("/orders/" + "user_id="+user_id + "&status=" + order_status)
 
         ajax.done(function(res){
             flash_message("Success")
