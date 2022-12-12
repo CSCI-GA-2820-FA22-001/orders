@@ -319,6 +319,7 @@ class OrderSingleResource(Resource):
 		return order_data, status.HTTP_200_OK
 
 	@api.doc('put_order_by_id')
+	@api.response(200, 'Success')
 	@api.response(404, 'Order not found')
 	def put(self, order_id):
 		"""Update order by order id
@@ -535,6 +536,7 @@ class SingleItemResource(Resource):
 			return "", status.HTTP_204_NO_CONTENT
 
 	@api.doc('update_item_in_order')
+	@api.response(200, "Success")
 	@api.response(204, 'Order or item not found')
 	def put(self, order_id, item_id):
 		"""Update items in order
