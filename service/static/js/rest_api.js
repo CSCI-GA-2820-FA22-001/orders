@@ -263,13 +263,20 @@ $(function () {
         
         let ajax = $.ajax({
             type: "GET",
-            url: "/orders/" + "user_id="+user_id + "&status=" + order_status,
+            url: "/orders?" + "user_id="+user_id + "&status=" + order_status,
+            contentType: "application/json",
+            data: ''
         });
 
-        console.log("/orders/" + "user_id="+user_id + "&status=" + order_status)
+        console.log("URL: " + "/orders?" + "user_id="+user_id + "&status=" + order_status)
 
         ajax.done(function(res){
             flash_message("Success")
+            console.log("calling update_form_data_order")
+            if($.trim(res)){
+                console.log("defined res: " + res)
+                update_order_table(res)
+            }
         });
 
         ajax.fail(function(res){
@@ -293,6 +300,7 @@ $(function () {
 
         ajax.done(function(res){
             flash_message("Success")
+            update_item_table(res)
         });
 
         ajax.fail(function(res){
@@ -307,7 +315,8 @@ $(function () {
     $("#update-order-btn").click(function () {
         let order_id = parseInt($("#order_id").val());
         let user_id = parseInt($("#user_id").val());
-        let status = status2int($("#status").val());
+        var e = document.getElementById("status");
+        var order_status = parseInt(e.value);
         let create_time = Math.floor(Date.now() / 1000);
         let items = [];
         if ($("#items").val().length > 0) {
@@ -319,11 +328,12 @@ $(function () {
         let data = {
             "user_id": user_id,
             "create_time": create_time,
-            "status": status,
-            "items": items
+            "items": items,
+            "status": order_status,
         };
-        console.log(`status:` + $("#status").val());
-        console.log(`data:` + JSON.stringify(data));
+
+        // console.log(`status:` + $("#status").val());
+        console.log(`updated order data:` + JSON.stringify(data));
 
         let ajax = $.ajax({
             type: "PUT",
@@ -333,11 +343,17 @@ $(function () {
         });
 
         ajax.done(function(res){
-            update_form_data_order(res)
+            // if($.trim(res)){
+            //     console.log("defined res: " + res)
+            //     update_form_data_order(res)
+            // }
             flash_message("Success")
+            console.log("defined res: " + res)
+            update_form_data_order(res)
         });
 
         ajax.fail(function(res){
+            console.log("fail res: " + JSON.stringify(res))
             flash_message(res.responseJSON.message)
         });
     });
@@ -373,7 +389,8 @@ $(function () {
 
     $("#cancel-order-btn").click(function () {
         let order_id = parseInt($("#order_id").val());
-        let status = status2int($("#status").val());
+        var e = document.getElementById("status");
+        var status = parseInt(e.value);
         $("#flash_message").empty();
 
         let status_json = {
