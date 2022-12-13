@@ -61,9 +61,9 @@ def generate_apikey():
 
 
 create_model = api.model('Order', {
-	'user_id': fields.Integer(description='The user id of the order', required=False),
-	'status': fields.String(enum=Status._member_names_, description='The status of the order', required=False),
-	'create_time': fields.Integer(description='The create time of the order', required=False),
+	'user_id': fields.Integer(description='The user id of the order', required=True),
+	'status': fields.Integer(enum=Status._member_names_, description='The status of the order', required=False),
+	'create_time': fields.Integer(description='The create time of the order', required=False)
 })
 
 order_model = api.inherit(
@@ -75,6 +75,11 @@ order_model = api.inherit(
 			description='The unique id assigned internally by service')
 	}
 )
+
+add_item_model = api.model('Add', {
+	'order_id': fields.Integer(description='The order id', required=False),
+	'item_id': fields.Integer(description='The item id', required=True)
+})
 
 order_args = reqparse.RequestParser()
 order_args.add_argument(
@@ -460,6 +465,7 @@ class ItemResource(Resource):
 	@api.doc('add_item_to_order')
 	@api.response(404, 'Order not found')
 	@api.response(201, 'Item added')
+	@api.expect(add_item_model)
 	def post(self, order_id):
 		"""Add item to order by id
 
