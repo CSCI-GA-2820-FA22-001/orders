@@ -92,7 +92,8 @@ Scenario: List item of order
     And I press "clear-order-btn" button
     And I paste the "order_id_for_item" field
     And I press "get-item-btn" button
-    Then I should see "Success" in the "flash_message"
+    # Then I should see "Success" in the "flash_message"
+    Then I should see the message "Success"
     And I should see "7" in the item results
 
 Scenario: Add item to order
