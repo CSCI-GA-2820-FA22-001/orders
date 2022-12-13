@@ -640,20 +640,6 @@ class SingleItemResource(Resource):
 #                 item.delete()
 #     return make_response("", status.HTTP_204_NO_CONTENT)
 
-# Test here
-@api.route("/items/all")
-class AllItemResource(Resource):
-	"""AllOrderResource class
-	"""
-	@api.doc('get_all_items')
-	@api.marshal_list_with(order_model)
-	def get(self):
-		"""List all items
-		"""
-		app.logger.info("List all items in the database")
-		items = Items.all()
-		return [item.serialize() for item in items], status.HTTP_200_OK
-
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

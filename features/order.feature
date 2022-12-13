@@ -115,7 +115,7 @@ Scenario: Delete item in order
     And I paste the "order_id_for_item" field
     And I set the "item_id" to "7"
     And I press "delete-item-btn" button
-    Then I should see "Success" in the "flash_message"
+    # Then I should see "Success" in the "flash_message"
     When I press "get-item-btn" button
     Then I should see "Success" in the "flash_message"
     Then I should not see "7" in the item results

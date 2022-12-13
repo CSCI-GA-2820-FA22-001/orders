@@ -15,13 +15,6 @@ def step_impl(context):
 		context.resp = requests.delete(f"{context.BASE_URL}/orders/{order['id']}")
 		expect(context.resp.status_code).to_equal(204)
 
-	# test Here
-	# List all of the items and delete them
-	context.resp = requests.get(f"{context.BASE_URL}/items/all")
-	expect(context.resp.status_code).to_equal(200)
-	for item in context.resp.json():
-		context.resp = requests.delete(f"{context.BASE_URL}/orders/{item['order_id']}/items/{item['item_id']}")
-
 	# load the database with new pets
 	for row in context.table:
 		# print(row)
