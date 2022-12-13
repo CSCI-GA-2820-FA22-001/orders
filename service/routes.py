@@ -102,6 +102,7 @@ class OrderResource(Resource):
 	@api.response(401, 'Unauthorized user for unknown user_id')
 	@api.response(400, 'Invalid data')
 	@api.response(204, 'Orders not found')
+	@api.expect(order_args)
 	@api.response(200, 'Success')
 	def get(self):
 		"""List all orders
@@ -151,6 +152,7 @@ class OrderResource(Resource):
 		return [order.serialize() for order in orders], status.HTTP_200_OK
 
 	@api.doc('create_order')
+	@api.expect(create_model)
 	@api.response(201, 'Order created')
 	def post(self):
 		"""Create an order
@@ -323,6 +325,7 @@ class OrderSingleResource(Resource):
 	@api.doc('put_order_by_id')
 	@api.response(200, 'Success')
 	@api.response(404, 'Order not found')
+	@api.expect(create_model)
 	def put(self, order_id):
 		"""Update order by order id
 		TODO: check if target id == json id
@@ -570,10 +573,14 @@ class SingleItemResource(Resource):
 		"""
 		order = Order.find(order_id)
 		if order:
+			app.logger.info("Calling delete item on order %s", order.id)
 			found = Items.find_by_order_id(order_id)
 			for item in found:
-				if item.id == item_id:
+				app.logger.info("try match with item = %s target = %s", item.id, item_id)
+				if item.item_id == item_id:
 					item.delete()
+					app.logger.info("Target Found, deleted item %s", item.id)
+		app.logger.info("Calling delete item finished")
 		return "", status.HTTP_204_NO_CONTENT
 
 
