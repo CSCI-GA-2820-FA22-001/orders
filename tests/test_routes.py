@@ -176,15 +176,15 @@ class TestYourResourceServer(TestCase):
 		item2 = Items(order_id=order1.id, item_id=2)
 		item1.create()
 		item2.create()
-		response = self.client.delete(f"{BASE_URL}/{order1.id}/items/{item1.id}")
+		response = self.client.delete(f"{BASE_URL}/{order1.id}/items/{item1.item_id}")
 		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 		found = Items.find_by_order_id(order_id=order1.id)
 		count = len([item for item in found])
 		self.assertEqual(count, 1)
-		self.assertEqual(found[0].id, item2.id)
+		self.assertEqual(found[0].item_id, item2.item_id)
 
-		response = self.client.delete(f"{BASE_URL}/{order1.id}/items/{item2.id+1}")
+		response = self.client.delete(f"{BASE_URL}/{order1.id}/items/{item2.item_id+1}")
 		found = Items.find_by_order_id(order_id=order1.id)
 		count = len([item for item in found])
 		self.assertEqual(count, 1)

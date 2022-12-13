@@ -571,10 +571,14 @@ class SingleItemResource(Resource):
 		"""
 		order = Order.find(order_id)
 		if order:
+			app.logger.info("Calling delete item on order %s", order.id)
 			found = Items.find_by_order_id(order_id)
 			for item in found:
-				if item.id == item_id:
+				app.logger.info("try match with item = %s target = %s", item.id, item_id)
+				if item.item_id == item_id:
 					item.delete()
+					app.logger.info("Target Found, deleted item %s", item.id)
+		app.logger.info("Calling delete item finished")
 		return "", status.HTTP_204_NO_CONTENT
 
 
