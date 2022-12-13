@@ -102,6 +102,7 @@ class OrderResource(Resource):
 	@api.response(401, 'Unauthorized user for unknown user_id')
 	@api.response(400, 'Invalid data')
 	@api.response(204, 'Orders not found')
+	@api.expect(order_args)
 	def get(self):
 		"""List all orders
 
@@ -150,6 +151,7 @@ class OrderResource(Resource):
 		return [order.serialize() for order in orders], status.HTTP_200_OK
 
 	@api.doc('create_order')
+	@api.expect(create_model)
 	@api.response(201, 'Order created')
 	def post(self):
 		"""Create an order
@@ -321,6 +323,7 @@ class OrderSingleResource(Resource):
 	@api.doc('put_order_by_id')
 	@api.response(200, 'Success')
 	@api.response(404, 'Order not found')
+	@api.expect(create_model)
 	def put(self, order_id):
 		"""Update order by order id
 		TODO: check if target id == json id
