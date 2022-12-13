@@ -578,7 +578,6 @@ class SingleItemResource(Resource):
 				if item.item_id == item_id:
 					item.delete()
 					app.logger.info("Target Found, deleted item %s", item.id)
-			
 		app.logger.info("Calling delete item finished")
 		return "", status.HTTP_204_NO_CONTENT
 
