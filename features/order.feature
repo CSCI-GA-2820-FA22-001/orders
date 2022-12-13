@@ -117,5 +117,5 @@ Scenario: Delete item in order
     And I press "delete-item-btn" button
     # Then I should see "Success" in the "flash_message"
     When I press "get-item-btn" button
-    Then I should see "Success" in the "flash_message"
+    # Then I should see "Success" in the "flash_message"
     Then I should not see "7" in the item results
