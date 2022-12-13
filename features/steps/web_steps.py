@@ -32,8 +32,15 @@ def step_impl(context, element_id, text_string):
 
 @then('I should see "{text}" in the "{element_id}"')
 def step_impl(context, text, element_id):
-	element = context.driver.find_element_by_id(element_id)
-	expect(element.text).to_equal(text)
+	# element = context.driver.find_element_by_id(element_id)
+	# expect(element.text).to_equal(text)
+	found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+		expected_conditions.text_to_be_present_in_element(
+			(By.ID, element_id),
+			text
+		)
+	)
+	expect(found).to_be(True)
 
 
 @then('I should see "{user_id}" in the result')
