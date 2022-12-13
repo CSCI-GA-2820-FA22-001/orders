@@ -102,6 +102,7 @@ class OrderResource(Resource):
 	@api.response(401, 'Unauthorized user for unknown user_id')
 	@api.response(400, 'Invalid data')
 	@api.response(204, 'Orders not found')
+	@api.response(200, 'Success')
 	def get(self):
 		"""List all orders
 
@@ -295,6 +296,7 @@ class OrderSingleResource(Resource):
 	"""OrderSingleResource
 	"""
 	@api.doc('get_order_by_id')
+	@api.response(200, 'Success')
 	@api.response(404, 'Order not found')
 	def get(self, order_id):
 		"""Get order by order id
