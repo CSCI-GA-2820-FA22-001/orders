@@ -34,7 +34,7 @@ Scenario: Create an order
     And I select "Created" in the "status" dropdown
     And I press "create-order-btn" button
     # Then I should see "Success" in the "flash_message"
-    When I set the "user_id" to "2"
+    And I set the "user_id" to "2"
     And I press "list-order-btn" button
     Then I should see "2" in the result
 
