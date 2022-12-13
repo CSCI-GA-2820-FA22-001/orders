@@ -12,6 +12,7 @@ services:
     volumes:
       - ..:/app
       - ~/.bluemix/apikey.json:/home/devops/apikey.json
+      - ~/Downloads/apikey.json:/home/devops/devapikey.json
     command: sleep infinity
     environment:
       FLASK_APP: service:app

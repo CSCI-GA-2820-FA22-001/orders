@@ -7,13 +7,20 @@ from service.models import Status
 @given('the following orders')
 def step_impl(context):
 	""" Delete all Pets and load new ones """
-	# List all of the pets and delete them one by one
+	# List all of the order and delete them one by one
 	rest_endpoint = f"{context.BASE_URL}/orders/all"
 	context.resp = requests.get(rest_endpoint)
 	expect(context.resp.status_code).to_equal(200)
 	for order in context.resp.json():
 		context.resp = requests.delete(f"{context.BASE_URL}/orders/{order['id']}")
 		expect(context.resp.status_code).to_equal(204)
+
+	# test Here
+	# List all of the items and delete them
+	context.resp = requests.get(f"{context.BASE_URL}/items/all")
+	expect(context.resp.status_code).to_equal(200)
+	for item in context.resp.json():
+		context.resp = requests.delete(f"{context.BASE_URL}/orders/{item['order_id']}/items/{item['item_id']}")
 
 	# load the database with new pets
 	for row in context.table:

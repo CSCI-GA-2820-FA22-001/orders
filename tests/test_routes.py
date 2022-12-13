@@ -495,3 +495,17 @@ class TestYourResourceServer(TestCase):
 		body = result.get_json()
 		self.assertEqual(result.status_code, status.HTTP_200_OK)
 		self.assertEqual(len(body), 3)
+
+	# test here
+	def test_get_all_item(self):
+		"""test_get_all_item"""
+		order1 = Order(user_id=123, create_time=(int)(time()), status=Status.CREATED)
+		order1.create()
+		item = Items(order_id=order1.id, item_id=1)
+		item.create()
+		item2 = Items(order_id=order1.id, item_id=2)
+		item2.create()
+		result = self.client.get("/items/all")
+		body = result.get_json()
+		self.assertEqual(result.status_code, status.HTTP_200_OK)
+		self.assertEqual(len(body), 2)
