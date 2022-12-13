@@ -427,6 +427,7 @@ $(function () {
         });
 
         ajax.done(function(res){
+            console.log("res: " + JSON.stringify(res));
             clear_form_data_order()
             flash_message("Success")
         });
@@ -491,7 +492,11 @@ $(function () {
             url: "/orders/" + order_id+ "/items/" + item_id
         });
 
+        console.log(`URL: ` + "/orders/" + order_id+ "/items/" + item_id);
+
         ajax.done(function(res){
+            console.log("Delete succeeded, res: " + JSON.stringify(res));
+            
             flash_message("Success")
         });
 
