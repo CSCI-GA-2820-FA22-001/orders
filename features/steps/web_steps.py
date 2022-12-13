@@ -84,6 +84,18 @@ def step_impl(context, name):
 	error_msg = "I should not see '%s' in '%s'" % (name, element.text)
 	ensure(name in element.text, False, error_msg)
 
+@then('I should not see "{name}" in the item results')
+def step_impl(context, name):
+	element = context.driver.find_element_by_id('search_results_item')
+	error_msg = "I should not see '%s' in '%s'" % (name, element.text)
+	ensure(name in element.text, False, error_msg)
+
+@then('I should see "{name}" in the item results')
+def step_impl(context, name):
+	element = context.driver.find_element_by_id('search_results_item')
+	error_msg = "I should not see '%s' in '%s'" % (name, element.text)
+	ensure(name in element.text, True, error_msg)
+
 @then('I should see "{text}" in the "{element_id}" input value')
 def step_impl(context, text, element_id):
 	element = context.driver.find_element_by_id(element_id)

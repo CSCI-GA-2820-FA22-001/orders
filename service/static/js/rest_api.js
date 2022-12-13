@@ -6,13 +6,13 @@ $(function () {
 
     // Updates the form with data from the response
     function status2int(status) {
-        if (status == "created")  {
+        if (status == "Created")  {
             return 1;
         }
-        if (status == "completed") {
+        if (status == "Completed") {
             return 2;
         }
-        if (status == "cancelled") {
+        if (status == "Cancelled") {
             return 3;
         }
         return 0;
@@ -20,13 +20,13 @@ $(function () {
 
     function int2status(status) {
         if (status == 1) {
-            return "created";
+            return "Created";
         }
         if (status == 2) {
-            return "completed";
+            return "Completed";
         }
         if (status == 3) {
-            return "cancelled";
+            return "Cancelled";
         }
         return "unknown";
     }
@@ -82,7 +82,7 @@ $(function () {
             table += `<tr id="row=${i}"> <td>${order.id}</td>` 
             table += `<td>${order.user_id}</td>`
             table += `<td> ${order.create_time} </td>`
-            table += `<td> ${order.status} </td>`
+            table += `<td> ${int2status(order.status)} </td>`
             table += `</tr>`
             if (i == 0) {
                 firstOrder = order;
@@ -228,29 +228,6 @@ $(function () {
     })
 
     // ****************************************
-    // Read an order by status and user id
-    // ****************************************
-
-    $("#search-order-by-status-btn").click(function () {
-        let order_status = parseInt($("#status").val());
-        let user_id = parseInt($("#user_id").val());
-        $("#flash_message").empty();
-        
-        let ajax = $.ajax({
-            type: "GET",
-            url: "/orders/" + user_id + "/" + status,
-        });
-
-        ajax.done(function(res){
-            flash_message("Success")
-        });
-
-        ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
-        });
-    });
-
-    // ****************************************
     // List all items id an order by order id
     // ****************************************
 
@@ -279,17 +256,27 @@ $(function () {
     // ****************************************
 
     $("#search-order-by-status-btn").click(function () {
-        let order_status = parseInt($("#status").val());
+        var e = document.getElementById("status");
+        var order_status = status2int(e.value);
         let user_id = parseInt($("#user_id").val());
         $("#flash_message").empty();
         
         let ajax = $.ajax({
             type: "GET",
-            url: "/orders/" + user_id + "/" + order_status,
+            url: "/orders?" + "user_id="+user_id + "&status=" + order_status,
+            contentType: "application/json",
+            data: ''
         });
+
+        console.log("URL: " + "/orders?" + "user_id="+user_id + "&status=" + order_status)
 
         ajax.done(function(res){
             flash_message("Success")
+            console.log("calling update_form_data_order")
+            if($.trim(res)){
+                console.log("defined res: " + res)
+                update_order_table(res)
+            }
         });
 
         ajax.fail(function(res){
@@ -313,6 +300,7 @@ $(function () {
 
         ajax.done(function(res){
             flash_message("Success")
+            update_item_table(res)
         });
 
         ajax.fail(function(res){
@@ -327,7 +315,8 @@ $(function () {
     $("#update-order-btn").click(function () {
         let order_id = parseInt($("#order_id").val());
         let user_id = parseInt($("#user_id").val());
-        let status = status2int($("#status").val());
+        var e = document.getElementById("status");
+        var order_status = status2int(e.value);
         let create_time = Math.floor(Date.now() / 1000);
         let items = [];
         if ($("#items").val().length > 0) {
@@ -339,11 +328,12 @@ $(function () {
         let data = {
             "user_id": user_id,
             "create_time": create_time,
-            "status": status,
-            "items": items
+            "items": items,
+            "status": order_status,
         };
-        console.log(`status:` + $("#status").val());
-        console.log(`data:` + JSON.stringify(data));
+
+        // console.log(`status:` + $("#status").val());
+        console.log(`updated order data:` + JSON.stringify(data));
 
         let ajax = $.ajax({
             type: "PUT",
@@ -353,11 +343,17 @@ $(function () {
         });
 
         ajax.done(function(res){
-            update_form_data_order(res)
+            // if($.trim(res)){
+            //     console.log("defined res: " + res)
+            //     update_form_data_order(res)
+            // }
             flash_message("Success")
+            console.log("defined res: " + res)
+            update_form_data_order(res)
         });
 
         ajax.fail(function(res){
+            console.log("fail res: " + JSON.stringify(res))
             flash_message(res.responseJSON.message)
         });
     });
@@ -393,7 +389,8 @@ $(function () {
 
     $("#cancel-order-btn").click(function () {
         let order_id = parseInt($("#order_id").val());
-        let status = status2int($("#status").val());
+        var e = document.getElementById("status");
+        var status = status2int(e.value);
         $("#flash_message").empty();
 
         let status_json = {
@@ -430,6 +427,7 @@ $(function () {
         });
 
         ajax.done(function(res){
+            console.log("res: " + JSON.stringify(res));
             clear_form_data_order()
             flash_message("Success")
         });
@@ -494,7 +492,11 @@ $(function () {
             url: "/orders/" + order_id+ "/items/" + item_id
         });
 
+        console.log(`URL: ` + "/orders/" + order_id+ "/items/" + item_id);
+
         ajax.done(function(res){
+            console.log("Delete succeeded, res: " + JSON.stringify(res));
+            
             flash_message("Success")
         });
 

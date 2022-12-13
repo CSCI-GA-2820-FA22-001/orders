@@ -176,15 +176,15 @@ class TestYourResourceServer(TestCase):
 		item2 = Items(order_id=order1.id, item_id=2)
 		item1.create()
 		item2.create()
-		response = self.client.delete(f"{BASE_URL}/{order1.id}/items/{item1.id}")
+		response = self.client.delete(f"{BASE_URL}/{order1.id}/items/{item1.item_id}")
 		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 		found = Items.find_by_order_id(order_id=order1.id)
 		count = len([item for item in found])
 		self.assertEqual(count, 1)
-		self.assertEqual(found[0].id, item2.id)
+		self.assertEqual(found[0].item_id, item2.item_id)
 
-		response = self.client.delete(f"{BASE_URL}/{order1.id}/items/{item2.id+1}")
+		response = self.client.delete(f"{BASE_URL}/{order1.id}/items/{item2.item_id+1}")
 		found = Items.find_by_order_id(order_id=order1.id)
 		count = len([item for item in found])
 		self.assertEqual(count, 1)
@@ -288,8 +288,8 @@ class TestYourResourceServer(TestCase):
 
 		resp = self.client.get(BASE_URL)
 		self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
-		data = resp.get_json()
-		self.assertIsNone(data)
+		# data = resp.get_json()
+		# self.assertIsNone(data)
 
 		resp = self.client.get(BASE_URL, query_string="user_id=0")
 		self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -335,8 +335,8 @@ class TestYourResourceServer(TestCase):
 
 		resp = self.client.post(f"{BASE_URL}/{order.id + 1}/cancel")
 		self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-		body = resp.get_json()
-		self.assertIsNone(body)
+		# body = resp.get_json()
+		# self.assertIsNone(body)
 
 	def test_get_order_by_status(self):
 		"""test getting order by status"""
@@ -412,6 +412,20 @@ class TestYourResourceServer(TestCase):
 		err_msg = "sample err message"
 		result = error_handlers.request_validation_error(err_msg)
 		self.assertEqual(str(result), str(error_handlers.bad_request(err_msg)))
+
+	def test_resource_not_found(self):
+		"""test_resource_not_found"""
+		err_msg = "resource not found"
+		result = error_handlers.not_found(err_msg)
+		t = (
+			jsonify(
+				status=status.HTTP_404_NOT_FOUND,
+				error="Not Found",
+				message=err_msg,
+			),
+			status.HTTP_404_NOT_FOUND,
+		)
+		self.assertEqual(str(result), str(t))
 
 	def test_method_not_supported(self):
 		"""test_method_not_supported"""
