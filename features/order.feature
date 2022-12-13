@@ -20,7 +20,8 @@ Scenario: List orders of a user
     When I visit the "Home Page"
     And I set the "user_id" to "1"
     And I press "list-order-btn" button
-    Then I should see "Success" in the "flash_message"
+    # Then I should see "Success" in the "flash_message"
+    Then I should see the message "Success"
     And I should see "1" in the result
     And I should see "1670369200" in the result
     And I should see "1670369201" in the result
@@ -70,10 +71,12 @@ Scenario: Delete an order
     And I set the "user_id" to "1"
     And I press "list-order-btn" button
     And I press "delete-order-btn" button
-    Then I should see "Success" in the "flash_message"
+    # Then I should see "Success" in the "flash_message"
+    Then I should see the message "Success"
     When I set the "user_id" to "1"
     And I press "list-order-btn" button
-    Then I should see "Success" in the "flash_message"
+    # Then I should see "Success" in the "flash_message"
+    Then I should see the message "Success"
     And I should see "1" in the result
     And I should see "1670369201" in the result
     And I should see "1670369202" in the result

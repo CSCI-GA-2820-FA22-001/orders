@@ -30,17 +30,21 @@ def step_impl(context, element_id, text_string):
 	element.send_keys(text_string)
 
 
-@then('I should see "{text}" in the "{element_id}"')
-def step_impl(context, text, element_id):
-	# element = context.driver.find_element_by_id(element_id)
-	# expect(element.text).to_equal(text)
+@then('I should see the message "{message}"')
+def step_impl(context, message):
 	found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
 		expected_conditions.text_to_be_present_in_element(
-			(By.ID, element_id),
-			text
+			(By.ID, 'flash_message'),
+			message
 		)
 	)
 	expect(found).to_be(True)
+
+
+@then('I should see "{text}" in the "{element_id}"')
+def step_impl(context, text, element_id):
+	element = context.driver.find_element_by_id(element_id)
+	expect(element.text).to_equal(text)
 
 
 @then('I should see "{user_id}" in the result')
