@@ -35,9 +35,10 @@ Scenario: Create an order
     And I press "create-order-btn" button
     # Then I should see "Success" in the "flash_message"
     Then I should see the message "Success"
-    And I set the "user_id" to "2"
+    When I set the "user_id" to "2"
     And I press "list-order-btn" button
-    Then I should see "2" in the result
+    Then I should see the message "Success"
+    And I should see "2" in the result
 
 Scenario: Retrive an order
     When I visit the "home page"
@@ -58,14 +59,17 @@ Scenario: Update an order
     When I visit the "home page"
     And I set the "user_id" to "1"
     And I press "list-order-btn" button
-    And I set the "user_id" to "2"
+    Then I should see the message "Success"
+    When I set the "user_id" to "2"
     And I set the "items" to "9,10"
     And I select "Completed" in the "status" dropdown
     And I press "update-order-btn" button
-    And I press "clear-order-btn" button
+    Then I should see the message "Success"
+    When I press "clear-order-btn" button
     And I set the "user_id" to "2"
     And I press "list-order-btn" button
-    Then I should see "2" in the result
+    Then I should see the message "Success"
+    And I should see "2" in the result
     And I should see "Completed" in the "status" input value
 
 
@@ -73,12 +77,11 @@ Scenario: Delete an order
     When I visit the "home page"
     And I set the "user_id" to "1"
     And I press "list-order-btn" button
-    And I press "delete-order-btn" button
-    # Then I should see "Success" in the "flash_message"
+    Then I should see the message "Success"
+    When I press "delete-order-btn" button
     Then I should see the message "Success"
     When I set the "user_id" to "1"
     And I press "list-order-btn" button
-    # Then I should see "Success" in the "flash_message"
     Then I should see the message "Success"
     And I should see "1" in the result
     And I should see "1670369201" in the result
@@ -91,11 +94,12 @@ Scenario: List item of order
     When I visit the "home page"
     And I set the "user_id" to "23"
     And I press "list-order-btn" button
-    And I copy the "order_id" field
+    Then I should see the message "Success"
+    When I copy the "order_id" field
     And I press "clear-order-btn" button
-    And I paste the "order_id_for_item" field
+    Then I should see the message "Success"
+    When I paste the "order_id_for_item" field
     And I press "get-item-btn" button
-    # Then I should see "Success" in the "flash_message"
     Then I should see the message "Success"
     And I should see "7" in the item results
 
@@ -103,26 +107,31 @@ Scenario: Add item to order
     When I visit the "home page"
     And I set the "user_id" to "23"
     And I press "list-order-btn" button
-    And I copy the "order_id" field
+    Then I should see the message "Success"
+    When I copy the "order_id" field
     And I press "clear-order-btn" button
-    And I paste the "order_id_for_item" field
+    Then I should see the message "Success"
+    When I paste the "order_id_for_item" field
     And I set the "item_id" to "2"
     And I press "add-item-btn" button
+    Then I should see the message "Success"
     # Then I should see "Success" in the "flash_message"
-    And I press "get-item-btn" button
+    When I press "get-item-btn" button
     # Then I should see "Success" in the "flash_message"
-    Then I should see "2" in the result
+    Then I should see the message "Success"
+    and I should see "2" in the result
 
 Scenario: Delete item in order
     When I visit the "home page"
     And I set the "user_id" to "23"
     And I press "list-order-btn" button
-    And I copy the "order_id" field
+    Then I should see the message "Success"
+    When I copy the "order_id" field
     And I press "clear-order-btn" button
     And I paste the "order_id_for_item" field
     And I set the "item_id" to "7"
     And I press "delete-item-btn" button
-    # Then I should see "Success" in the "flash_message"
+    Then I should see the message "Success"
     When I press "get-item-btn" button
-    # Then I should see "Success" in the "flash_message"
+    Then I should see the message "Success"
     Then I should not see "7" in the item results
