@@ -1,7 +1,6 @@
 import requests
 from behave import given
 from compare import expect
-from service.models import Status
 
 
 @given('the following orders')

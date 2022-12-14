@@ -20,7 +20,6 @@ Scenario: List orders of a user
     When I visit the "Home Page"
     And I set the "user_id" to "1"
     And I press "list-order-btn" button
-    # Then I should see "Success" in the "flash_message"
     Then I should see the message "Success"
     And I should see "1" in the result
     And I should see "1670369200" in the result
@@ -35,6 +34,7 @@ Scenario: Create an order
     And I select "Created" in the "status" dropdown
     And I press "create-order-btn" button
     # Then I should see "Success" in the "flash_message"
+    Then I should see the message "Success"
     And I set the "user_id" to "2"
     And I press "list-order-btn" button
     Then I should see "2" in the result
@@ -43,11 +43,14 @@ Scenario: Retrive an order
     When I visit the "home page"
     And I set the "user_id" to "1"
     And I press "list-order-btn" button
-    And I copy the "order_id" field
+    Then I should see the message "Success"
+    When I copy the "order_id" field
     And I press "clear-order-btn" button
-    And I paste the "order_id" field
+    Then I should see the message "Success"
+    When I paste the "order_id" field
     And I press "retrieve-order-btn" button
-    Then I should see "1670369200" in the "create_time" input value
+    Then I should see the message "Success"
+    And I should see "1670369200" in the "create_time" input value
     And I should see "1" in the "user_id" input value
     And I should see "Created" in the "status" input value
 
